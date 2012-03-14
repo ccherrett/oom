@@ -539,6 +539,8 @@ void JackAudioDevice::graphChanged()
 					//FIXME: This is the code that removes the route from the input track if jack dies
 					if (!found)
 					{
+						if(debugMsg)
+							qDebug("JackAudioDevice::graphChanged: remove port: %s, from %s", portName, it->name().toUtf8().constData());
 						audio->msgRemoveRoute1(
 								Route(portName, false, channel, Route::JACK_ROUTE),
 								Route(it, channel)

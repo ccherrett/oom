@@ -832,6 +832,51 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 				}
 				if(isSynth || !track->samplerData())
 				{//We need to deal with closing the synth devices first
+					Track* input = 0;/*{{{*/
+					QList<qint64> *chain = track->audioChain();
+					if(chain && !chain->isEmpty())
+					{
+						for(int c = 0; c < chain->size(); c++)
+						{
+							input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
+							if(input)
+								break;
+						}
+					}
+					if(input)
+					{//Remove route
+						int channels = input->channels();
+						for(int i = 0; i < channels; i++)
+						{
+							if(debugMsg)
+								qDebug("TrackManager::setTrackInstrument: Removing route for channel: %d", i);
+							AudioInput* itrack = (AudioInput*)input;
+							if(itrack)
+							{
+								RouteList* rl = itrack->inRoutes();
+								for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
+								{
+									if (irl->channel != i)
+										continue;
+									QString name = irl->name();
+									QByteArray ba = name.toLatin1();
+									const char* portName = ba.constData();
+									if(name.contains(QString("O-").append(m_track->name()).append(":output")))
+									{
+										Route srcRoute(portName, false, i, Route::JACK_ROUTE);
+										Route dstRoute(itrack, i);
+										if(debugMsg)
+										{
+											qDebug("TrackManager::setTrackInstrument: srcRoute: %s, %d, %d\n", portName, true, Route::JACK_ROUTE);
+											qDebug("TrackManager::setTrackInstrument: dstRoute: %s, %d, %d\n", itrack->name().toUtf8().constData(), true, i);
+										}
+										audio->msgRemoveRoute(srcRoute, dstRoute);
+										break;
+									}
+								}		
+							}
+						}
+					}/*}}}*/
 					if(isSynth)
 					{
 						//if(debugMsg)
@@ -883,7 +928,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 								song->update(SC_ROUTE);
 							}
 							
-							Track *input = 0;
+							input = 0;
 							Track *buss = 0;
 							QList<qint64> *chain = track->audioChain();
 							if(chain && !chain->isEmpty())
@@ -1046,7 +1091,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							qDebug("TrackManager::setTrackInstrument: Removing midi Device: %s", md->name().toUtf8().constData());
 						midiDevices.remove(md);
 						//Remove Audio Routes
-						Track* input = 0;
+						Track* input = 0;/*{{{*/
 						QList<qint64> *chain = track->audioChain();
 						if(chain && !chain->isEmpty())
 						{
@@ -1079,7 +1124,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 										audioDevice->unregisterPort(((AudioInput*)input)->jackPort(i));
 								}*/
 							}
-						}
+						}/*}}}*/
 						//Remove the LinuxSampler channel
 						if(lsClientStarted)
 						{
