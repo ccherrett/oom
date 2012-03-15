@@ -39,6 +39,7 @@
 #include "plugin.h"
 #include "shortcuts.h"
 #include "TrackManager.h"
+#include "TrackInstrumentMenu.h"
 
 #include "traverso_shared/TConfig.h"
 
