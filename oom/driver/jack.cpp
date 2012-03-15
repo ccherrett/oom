@@ -517,11 +517,13 @@ void JackAudioDevice::graphChanged()
 			while(erased)//for (int i = 0; i < 20; i++)
 			{
 				erased = false;
-				for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
+				//for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
+				for(int r = 0; r < rl->size(); r++)
 				{
-					if (irl->channel != channel)
+					Route src = rl->at(r);
+					if (src.channel != channel)
 						continue;
-					QString name = irl->name();
+					QString name = src.name();
 					QByteArray ba = name.toLatin1();
 					const char* portName = ba.constData();
 					//printf("portname=%s\n", portName);
@@ -539,6 +541,7 @@ void JackAudioDevice::graphChanged()
 					//FIXME: This is the code that removes the route from the input track if jack dies
 					if (!found)
 					{
+						src = rl->takeAt(r);
 						if(debugMsg)
 							qDebug("JackAudioDevice::graphChanged: remove port: %s, from %s", portName, it->name().toUtf8().constData());
 						audio->msgRemoveRoute1(
