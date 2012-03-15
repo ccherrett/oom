@@ -93,6 +93,8 @@ private slots:
     void editorPartChanged(Part*);
     void transposeStateChanged(bool);
 	void toggleSynthGui(bool);
+	void instrumentChangeRequested(qint64, const QString&, int);
+	void generateInstrumentMenu();
 
 protected slots:
     virtual void heartBeat();

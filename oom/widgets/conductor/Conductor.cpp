@@ -232,6 +232,9 @@ Conductor::Conductor(QWidget* parent, Track* sel_track) : QFrame(parent)//QWidge
 	connect(btnTranspose, SIGNAL(toggled(bool)), SIGNAL(globalTransposeClicked(bool)));
 	connect(btnComments, SIGNAL(toggled(bool)), SIGNAL(toggleComments(bool)));
 
+	btnInstrument->setIcon(*instrumentIconSet3);
+	connect(btnInstrument, SIGNAL(clicked()), this, SLOT(generateInstrumentMenu()));
+
 	btnShowGui->setShortcut(shortcuts[SHRT_SHOW_PLUGIN_GUI].key);
 	connect(btnShowGui, SIGNAL(toggled(bool)), this, SLOT(toggleSynthGui(bool)));
 
@@ -516,6 +519,10 @@ void Conductor::heartBeat()
 				int oPort = ((MidiTrack*) selected)->outPort();
 				MidiPort* port = &midiPorts[oPort];
 
+				if(port)
+					btnInstrument->setToolTip(QString(tr("Change Instrument: ")).append(port->instrument()->iname()));
+				else
+					btnInstrument->setToolTip(tr("Change Instrument"));
     		    if (port->device() && port->device()->isSynthPlugin())
     		    {
                     btnShowGui->setEnabled(true);
@@ -1374,6 +1381,25 @@ void Conductor::iPanDoubleClicked()
 	song->update(SC_MIDI_CONTROLLER);
 }
 
+void Conductor::generateInstrumentMenu()/*{{{*/
+{
+	if(!selected || !selected->isMidiTrack())
+		return;
+
+	QMenu* p = new QMenu(this);
+	TrackInstrumentMenu *imenu = new TrackInstrumentMenu(p, selected);
+	connect(imenu, SIGNAL(instrumentSelected(qint64, const QString&, int)), this, SLOT(instrumentChangeRequested(qint64, const QString&, int)));
+
+	p->addAction(imenu);
+	p->exec(QCursor::pos());
+
+	delete p;
+}/*}}}*/
+
+void Conductor::instrumentChangeRequested(qint64 id, const QString& instrument, int type)
+{
+	trackManager->setTrackInstrument(id, instrument, type);
+}
 
 //---------------------------------------------------------
 //   updateConductor

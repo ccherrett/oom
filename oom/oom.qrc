@@ -351,6 +351,10 @@
 		<file>images/automation_menu_title.png</file>
 		<file>images/instrument_menu_title.png</file>
 
+		<file>images/instrument_new_on.png</file>
+		<file>images/instrument_new_over.png</file>
+		<file>images/instrument_new_off.png</file>
+
 		<file>images/icons/mixer_record_new_on.png</file>
 		<file>images/icons/mixer_record_new_over.png</file>
 		<file>images/icons/mixer_record_new_off.png</file>

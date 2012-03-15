@@ -848,6 +848,10 @@ QPixmap* automation_track_OverIcon;
 QPixmap* instrument_track_OffIcon;
 QPixmap* instrument_track_OverIcon;
 
+QPixmap* instrument_OnIcon;
+QPixmap* instrument_OffIcon;
+QPixmap* instrument_OverIcon;
+
 QIcon* reminder1IconSet3;
 QIcon* reminder2IconSet3;
 QIcon* reminder3IconSet3;
@@ -857,6 +861,7 @@ QIcon* mute_trackIconSet3;
 QIcon* solo_trackIconSet3;
 QIcon* automation_trackIconSet3;
 QIcon* instrument_trackIconSet3;
+QIcon* instrumentIconSet3;
 QIcon* input_indicatorIconSet3;
 
 QPixmap* armAllIcon;
@@ -1689,6 +1694,10 @@ void initIcons()
       instrument_track_OffIcon                      = new MPIXMAP(":/images/icons/instrument_track_new_off.png", NULL);
       instrument_track_OverIcon                     = new MPIXMAP(":/images/icons/instrument_track_new_over.png", NULL);
 	  
+      instrument_OnIcon                             = new MPIXMAP(":/images/instrument_new_on.png", NULL);
+      instrument_OffIcon                            = new MPIXMAP(":/images/instrument_new_off.png", NULL);
+      instrument_OverIcon                           = new MPIXMAP(":/images/instrument_new_over.png", NULL);
+	  
 	  reminder1IconSet3         = new QIcon();
 	  reminder1IconSet3->addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
       reminder1IconSet3->addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
@@ -1731,6 +1740,11 @@ void initIcons()
 	  instrument_trackIconSet3         = new QIcon();
       instrument_trackIconSet3->addPixmap(*instrument_track_OffIcon, QIcon::Normal, QIcon::Off);
       instrument_trackIconSet3->addPixmap(*instrument_track_OverIcon, QIcon::Active);
+
+	  instrumentIconSet3         = new QIcon();
+      instrumentIconSet3->addPixmap(*instrument_OnIcon, QIcon::Normal, QIcon::On);
+      instrumentIconSet3->addPixmap(*instrument_OffIcon, QIcon::Normal, QIcon::Off);
+      instrumentIconSet3->addPixmap(*instrument_OverIcon, QIcon::Active);
 
       oomIcon                                      = new MPIXMAP(oom_icon_xpm, NULL);
       aboutOOMidiImage                             = new MPIXMAP(":/images/oom-about.png", NULL);

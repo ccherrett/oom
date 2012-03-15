@@ -481,6 +481,9 @@ extern QPixmap* automation_track_OffIcon;
 extern QPixmap* automation_track_OverIcon;
 extern QPixmap* instrument_track_OffIcon;
 extern QPixmap* instrument_track_OverIcon;
+extern QPixmap* instrument_OnIcon;
+extern QPixmap* instrument_OffIcon;
+extern QPixmap* instrument_OverIcon;
 extern QPixmap* enabled_OnIcon;
 extern QPixmap* enabled_OffIcon;
 extern QPixmap* enabled_OverIcon;
@@ -625,6 +628,7 @@ extern QIcon* solo_trackIconSet3;
 extern QIcon* input_indicatorIconSet3;
 extern QIcon* automation_trackIconSet3;
 extern QIcon* instrument_trackIconSet3;
+extern QIcon* instrumentIconSet3;
 
 extern QPixmap* oomIcon;
 extern QPixmap* aboutOOMidiImage;
