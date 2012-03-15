@@ -199,7 +199,15 @@ void CanvasNavigator::updateCanvasBox()/*{{{*/
 		h = (h * 8)/100;
 		double y = mapped.y();
 		y = (y * 8)/100;
-		QRectF real(calcSize(mapped.x()), y, calcSize(mapped.width()), h);
+		int w = mapped.width();
+		int len = song->len();
+		int x = mapped.x();
+		int add = x+w;
+		if(add > len)
+		{
+			w = (len - x);
+		}
+		QRectF real(calcSize(mapped.x()), y, calcSize(w), h);
 		m_canvasBox->setRect(real);
 		//m_view->ensureVisible(m_canvasBox, 0, 0);
 	}
@@ -332,6 +340,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 	m_playhead->setBrush(colTimeLine);
 	m_playhead->setPen(Qt::NoPen);
 	m_playhead->setZValue(124001.0f);
+	m_playhead->setFlags(QGraphicsItem::ItemIgnoresTransformations);
 	m_scene->addItem(m_playhead);
 	QColor loopColor(139, 225, 69);
 	QColor markerColor(243,191,124);
@@ -345,6 +354,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 		marker->setPen(Qt::NoPen);
 		marker->setBrush(markerColor);
 		marker->setZValue(124002.0f);
+		marker->setFlags(QGraphicsItem::ItemIgnoresTransformations);
 		m_updateMarkers = true;
 	}
 
@@ -352,6 +362,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 	m_punchIn->setBrush(loopColor);
 	m_punchIn->setPen(Qt::NoPen);
 	m_punchIn->setZValue(124003.0f);
+	m_punchIn->setFlags(QGraphicsItem::ItemIgnoresTransformations);
 	m_scene->addItem(m_punchIn);
 	m_punchIn->setVisible(song->loop() || song->punchin());
 
@@ -359,6 +370,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 	m_punchOut->setBrush(loopColor);
 	m_punchOut->setPen(Qt::NoPen);
 	m_punchOut->setZValue(124003.0f);
+	m_punchOut->setFlags(QGraphicsItem::ItemIgnoresTransformations);
 	m_scene->addItem(m_punchOut);
 	m_punchOut->setVisible(song->loop() || song->punchout());
 
