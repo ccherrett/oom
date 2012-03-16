@@ -329,7 +329,8 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
             oldPlugin->setActive(false);
             oldPlugin->aboutToRemove();
 
-            qCritical("Plugin to remove now and here");
+            if(debugMsg)
+				qCritical("Plugin to remove now and here");
 
             audio->msgAddPlugin(track, idx, 0);
 			song->dirty = true;
@@ -396,19 +397,19 @@ void EffectRack::doubleClicked(QListWidgetItem* it)
 		return;
 	}
 
-        if (pipe)
+    if (pipe)
+    {
+        if (pipe->hasNativeGui(idx))
         {
-            if (pipe->hasNativeGui(idx))
-            {
-                bool flag = !pipe->nativeGuiVisible(idx);
-                pipe->showNativeGui(idx, flag);
-            }
-            else
-            {
-                bool flag = !pipe->guiVisible(idx);
-                pipe->showGui(idx, flag);
-            }
+            bool flag = !pipe->nativeGuiVisible(idx);
+            pipe->showNativeGui(idx, flag);
         }
+        else
+        {
+            bool flag = !pipe->guiVisible(idx);
+            pipe->showGui(idx, flag);
+        }
+    }
 }
 
 void EffectRack::savePreset(int idx)/*{{{*/
@@ -481,7 +482,8 @@ void EffectRack::startDrag(int idx)
 	Pipeline* pipe = track->efxPipe();
 	if (pipe)
 	{
-		if (idx >= 0 && (*pipe)[idx] != NULL)
+		int size = pipe->size();
+		if (idx < size)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"2.0\"");
@@ -528,6 +530,7 @@ QStringList EffectRack::mimeTypes() const
 
 void EffectRack::dropEvent(QDropEvent *event)/*{{{*/
 {
+    event->accept();
 	QString text;
 	QListWidgetItem *i = itemAt(event->pos());
 	if (!i)
@@ -538,7 +541,8 @@ void EffectRack::dropEvent(QDropEvent *event)/*{{{*/
 	Pipeline* pipe = track->efxPipe();
 	if (pipe)
 	{
-		if (idx >= 0 && (*pipe)[idx] != NULL)
+		int size = pipe->size();
+		if (idx < size)
 		{
 			QWidget *sw = event->source();
 			if (sw)
@@ -575,7 +579,9 @@ void EffectRack::dropEvent(QDropEvent *event)/*{{{*/
 			QString outxml(md->data("text/x-oom-plugin"));
 			//qDebug("EffectRack::dropEvent Event data:\n%s", outxml.toUtf8().constData());
 			//Xml xml(event->mimeData()->data("text/x-oom-plugin").data());
-			Xml xml(outxml.toUtf8().constData());
+			QByteArray ba = outxml.toUtf8();
+			const char* data =  ba.constData();
+			Xml xml(data);
 			initPlugin(xml, idx);
 		}
 		else if (event->mimeData()->hasUrls())
@@ -639,10 +645,11 @@ void EffectRack::mouseMoveEvent(QMouseEvent *event)
 		Pipeline* pipe = track->efxPipe();
 		if (!pipe)
 			return;
-
+	
+		int size = pipe->size();
 		QListWidgetItem *i = itemAt(dragPos);
 		int idx0 = row(i);
-		if (!(*pipe)[idx0])
+		if (idx0 >= size)
 			return;
 
 		int distance = (dragPos - event->pos()).manhattanLength();

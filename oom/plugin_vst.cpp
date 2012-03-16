@@ -1086,8 +1086,8 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                             m_gui->updateValues();
                         return false;
                     }
+                	return true;
                 }
-                return true;
 
             default:
                 break;
@@ -1174,7 +1174,8 @@ bool VstPlugin::loadParameter(Xml& xml)
                 setParameterValue(idx, val);
                 return false;
             }
-            return true;
+			else if(tag == "parameter")
+	            return true;
 
         default:
             break;

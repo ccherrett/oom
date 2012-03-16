@@ -681,8 +681,8 @@ bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
                         m_gui->updateValues();
                     return false;
                 }
+            	return true;
             }
-            return true;
 
         default:
             break;

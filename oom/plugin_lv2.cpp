@@ -2021,7 +2021,10 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
                 LilvNode* pluginURI = lilv_new_uri(lv2world->world, new_uri.toAscii().constData());
                 lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
 				if(!lplug)
+				{
+					qDebug("Lv2Plugin::readConfiguration: Plugin lookup FAILED");
 					return true;
+				}
                 lilv_node_free(pluginURI);
 
                 if (lplug)
@@ -2029,12 +2032,15 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
                     new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));
                     
                     if (init(new_uri, new_label) == false)
+					{
+						qDebug("Lv2Plugin::readConfiguration: Plugin initialization FAILED");
                         // plugin failed to initialize
                         return true;
+					}
                 }
                 else
                 {
-                    qWarning("Failed to find LV2 plugin with uri '%s'", new_uri.toUtf8().constData());
+                    qWarning("Lv2Plugin::readConfiguration: Failed to find LV2 plugin with uri '%s'", new_uri.toUtf8().constData());
                     return true;
                 }
             }
@@ -2109,9 +2115,8 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
                         m_gui->updateValues();
                     return false;
                 }
+            	return true;
             }
-            return true;
-
         default:
             break;
         }
@@ -2171,6 +2176,8 @@ void Lv2Plugin::writeConfiguration(int level, Xml& xml)
 
 bool Lv2Plugin::loadControl(Xml& xml)
 {
+	if(debugMsg)
+		qDebug("Lv2Plugin::loadControl:");
     QString symbol;
     QString oldName;
     double val = 0.0;
@@ -2202,7 +2209,8 @@ bool Lv2Plugin::loadControl(Xml& xml)
         case Xml::TagEnd:
             if (tag == "control" && lplug)
                 return setControl(symbol, oldName, val);
-            return true;
+			else if(tag == "control")
+            	return true;
 
         default:
             break;
