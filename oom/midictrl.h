@@ -48,6 +48,7 @@ const int CTRL_VARIATION_SEND = 0x5e;
 const int CTRL_ALL_SOUNDS_OFF = 0x78; // 120
 const int CTRL_RESET_ALL_CTRL = 0x79; // 121
 const int CTRL_LOCAL_OFF = 0x7a; // 122
+const int CTRL_ALL_NOTES_OFF = 0x7b; // 123
 
 // controller types 0x10000 - 0x1ffff are 14 bit controller with
 //    0x1xxyy

@@ -317,10 +317,6 @@ void Audio::shutdown()
 
 void Audio::process(unsigned frames)
 {
-	// Disabled by Tim. p3.3.22
-	//      extern int watchAudio;
-	//      ++watchAudio;           // make a simple watchdog happy
-
 	if (!checkAudioDevice()) return;
 	if (msg)
 	{
@@ -998,16 +994,18 @@ void Audio::stopRolling()
 		MidiPort* mp = &midiPorts[i];
 		for (int ch = 0; ch < MIDI_CHANNELS; ++ch)
 		{
+			if(!mp->device())
+				continue;
 			if (mp->hwCtrlState(ch, CTRL_SUSTAIN) == 127)
 			{
-				if (mp->device() != NULL)
-				{
-					//printf("send clear sustain!!!!!!!! port %d ch %d\n", i,ch);
-					MidiPlayEvent ev(0, i, ch, ME_CONTROLLER, CTRL_SUSTAIN, 0);
-					// may cause problems, called from audio thread
-					mp->device()->putEvent(ev);
-				}
+				//printf("send clear sustain!!!!!!!! port %d ch %d\n", i,ch);
+				MidiPlayEvent susEv(0, i, ch, ME_CONTROLLER, CTRL_SUSTAIN, 0);
+				// may cause problems, called from audio thread
+				mp->device()->putEvent(susEv);
 			}
+			mp->sendEvent(MidiPlayEvent(0, i, ch, ME_CONTROLLER, CTRL_ALL_SOUNDS_OFF, 0), true);
+			mp->sendEvent(MidiPlayEvent(0, i, ch, ME_CONTROLLER, CTRL_ALL_NOTES_OFF, 0), true);
+			mp->sendEvent(MidiPlayEvent(0, i, ch, ME_CONTROLLER, CTRL_RESET_ALL_CTRL, 0), true);
 		}
 	}
 

@@ -704,13 +704,21 @@ void Audio::panic()
     for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
     {
         MidiDevice* dev = *i;
+        MPEventList* el  = 0;//synth->playEvents();
+        MPEventList* sel = 0;//synth->stuckNotes();
         if (dev && dev->isSynthPlugin())
         {
             SynthPluginDevice* synth = (SynthPluginDevice*)dev;
             if (!synth->plugin())
                 continue;
-            MPEventList* el  = synth->playEvents();
-            MPEventList* sel = synth->stuckNotes();
+            el  = synth->playEvents();
+            sel = synth->stuckNotes();
+		}
+		else
+		{
+			el = dev->playEvents();
+			sel = dev->stuckNotes();
+		}
 
             // stop all notes
 			el->clear();
@@ -723,23 +731,24 @@ void Audio::panic()
 				el->add(ev);
 			}
 			sel->clear();
-        }
+        //}
     }
 #endif
 
-	for (int i = 0; i < MIDI_PORTS; ++i)
+	for (int i = 0; i < MIDI_PORTS; ++i)/*{{{*/
 	{
 		MidiPort* port = &midiPorts[i];
-		if (port == 0) // ??
+		if (!port || !port->device()) 
 			continue;
 		for (int chan = 0; chan < MIDI_CHANNELS; ++chan)
 		{
 			if (debugMsg)
 				 printf("send all sound of to midi port %d channel %d\n", i, chan);
 			port->sendEvent(MidiPlayEvent(0, i, chan, ME_CONTROLLER, CTRL_ALL_SOUNDS_OFF, 0), true);
+			port->sendEvent(MidiPlayEvent(0, i, chan, ME_CONTROLLER, CTRL_ALL_NOTES_OFF, 0), true);
 			port->sendEvent(MidiPlayEvent(0, i, chan, ME_CONTROLLER, CTRL_RESET_ALL_CTRL, 0), true);
 		}
-	}
+	}/*}}}*/
 }
 
 //---------------------------------------------------------
@@ -1455,10 +1464,15 @@ void Audio::processMidi()
 			MPEventList* playEvents = md->playEvents();
 			MPEventList* stuckNotes = md->stuckNotes();
 			if(playEvents->size())
-				qDebug("Audio::processMidi: State STOP: playEvents.size(%d), stuckNotes.size(%d)",
-					(int)playEvents->size(),
-					(int)stuckNotes->size()
-				);
+			{
+				if(debugMsg)
+					qDebug("Audio::processMidi: State STOP: device name: %s, playEvents.size(%d), stuckNotes.size(%d)",
+						md->name().toUtf8().constData(),
+						(int)playEvents->size(),
+						(int)stuckNotes->size()
+					);
+				playEvents->clear();
+			}	
 			for (iMPEvent k = stuckNotes->begin(); k != stuckNotes->end(); ++k)
 			{
 				MidiPlayEvent ev(*k);
