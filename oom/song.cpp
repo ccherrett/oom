@@ -3719,7 +3719,8 @@ void Song::updateTrackViews()
 		}
 		if(ait && ait->selected())/*{{{*/
 		{
-			qDebug("Song::updateTrackViews: Selected View: %s", ait->viewName().toUtf8().constData());
+			if(debugMsg)
+				qDebug("Song::updateTrackViews: Selected View: %s", ait->viewName().toUtf8().constData());
 			viewselected = true;
 			QList<qint64> *tlist = ait->trackIndexList();
 			QMap<qint64, TrackView::TrackViewTrack*> *tvlist = ait->tracks();

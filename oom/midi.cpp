@@ -1465,12 +1465,12 @@ void Audio::processMidi()
 			MPEventList* stuckNotes = md->stuckNotes();
 			if(playEvents->size())
 			{
-				if(debugMsg)
+				/*if(debugMsg)
 					qDebug("Audio::processMidi: State STOP: device name: %s, playEvents.size(%d), stuckNotes.size(%d)",
 						md->name().toUtf8().constData(),
 						(int)playEvents->size(),
 						(int)stuckNotes->size()
-					);
+					);*/
 				playEvents->clear();
 			}	
 			for (iMPEvent k = stuckNotes->begin(); k != stuckNotes->end(); ++k)
