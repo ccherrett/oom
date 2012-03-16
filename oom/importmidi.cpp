@@ -21,16 +21,15 @@
 #include "midiport.h"
 #include "transport.h"
 #include "Composer.h"
-//#include "Composer/Composer.h"    // p4.0.2
 #include "mpevent.h"
 #include "event.h"
 #include "midictrl.h"
 #include "instruments/minstrument.h"
 #include "drummap.h"
-//#include "midiedit/drummap.h"    // p4.0.2        
 #include "xml.h"
 #include "audio.h"
 #include "gconfig.h"
+#include "utils.h"
 
 //---------------------------------------------------------
 //   importMidi
@@ -81,7 +80,8 @@ void OOMidi::importMidi(const QString &file)
 //    return true on error
 //---------------------------------------------------------
 
-bool OOMidi::importMidi(const QString name, bool merge)
+#if 0
+bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 {
 	bool popenFlag;
 	FILE* fp = fileOpen(this, name, QString(".mid"), "r", popenFlag);
@@ -267,7 +267,201 @@ bool OOMidi::importMidi(const QString name, bool merge)
 	}
 
 	return false;
-}
+}/*}}}*/
+#endif
+
+bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
+{
+	bool popenFlag;
+	FILE* fp = fileOpen(this, name, QString(".mid"), "r", popenFlag);
+	if (fp == 0)
+		return true;
+	MidiFile mf(fp);
+	bool rv = mf.read();
+	popenFlag ? pclose(fp) : fclose(fp);
+	if (rv)
+	{
+		QString s(tr("reading midifile\n  "));
+		s += name;
+		s += tr("\nfailed: ");
+		s += mf.error();
+		QMessageBox::critical(this, QString("OOStudio"), s);
+		return rv;
+	}
+	//
+	//  evaluate song Type (GM, XG, GS, unknown)
+	//
+	MType t = song->mtype();
+	if (!merge)
+	{
+		t = mf.mtype();
+		song->setMType(t);
+	}
+	MidiInstrument* instr = 0;
+	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+	{
+		MidiInstrument* mi = *i;
+		if ((mi->iname() == "GM" && ((t == MT_UNKNOWN) || (t == MT_GM)))
+				|| ((mi->iname() == "GS") && (t == MT_GS))
+				|| ((mi->iname() == "XG") && (t == MT_XG)))
+		{
+			instr = mi;
+			break;
+		}
+	}
+	if (instr == 0)
+	{
+		// the standard instrument files (GM, GS, XG) must be present
+		printf("no instrument, type %d\n", t);
+		return true;
+		//abort();
+	}
+
+	MidiFileTrackList* etl = mf.trackList();
+	int division = mf.division();
+
+	//
+	// create MidiTrack and copy events to ->events()
+	//    - combine note on/off events
+	//    - calculate tick value for internal resolution
+	//
+	int mPort = getFreeMidiPort();
+	for (iMidiFileTrack t = etl->begin(); t != etl->end(); ++t)
+	{
+		MPEventList* el = &((*t)->events);
+		if (el->empty())
+			continue;
+		//
+		// if we split the track, SYSEX and META events go into
+		// the first target track
+
+		bool first = true;
+		// somewhat silly and slooow:
+		if(mPort >= 0 && mPort < MIDI_PORTS)
+		{
+			for (int channel = 0; channel < MIDI_CHANNELS; ++channel)
+			{
+				//
+				// check if there are any events for port/channel in track:
+				//
+				iMPEvent i;
+				for (i = el->begin(); i != el->end(); ++i)
+				{
+					MidiPlayEvent ev = *i;
+					if (ev.type() != ME_SYSEX && ev.type() != ME_META && ev.channel() == channel)
+						break;
+				}
+				if (i == el->end())
+					continue;
+				MidiTrack* track = new MidiTrack();
+				track->setMasterFlag(true);
+				/*if ((*t)->isDrumTrack)
+				{
+					track->setType(Track::DRUM);
+				}*/
+
+				track->setOutChannel(channel);
+				track->setOutPort(mPort);
+
+				MidiPort* mport = &midiPorts[track->outPort()];
+				// this overwrites any instrument set for this port:
+				mport->setInstrument(instr);
+
+				EventList* mel = track->events();
+				//buildMidiEventList(mel, el, track, division, first);
+				// Don't do loops.
+				buildMidiEventList(mel, el, track, division, first, false, false);
+				first = false;
+
+				// Hmm. buildMidiEventList already takes care of this.
+				// But it seems to work. How? Must test.
+				/*if (channel == 9 && song->mtype() != MT_UNKNOWN)
+				{
+					track->setType(Track::DRUM);
+					//
+					// remap drum pitch with drumInmap
+					//
+					EventList* tevents = track->events();
+					for (iEvent i = tevents->begin(); i != tevents->end(); ++i)
+					{
+						Event ev = i->second;
+						if (ev.isNote())
+						{
+							int pitch = drumInmap[ev.pitch()];
+							ev.setPitch(pitch);
+						}
+						else
+							if (ev.type() == Controller)
+						{
+							int ctl = ev.dataA();
+							MidiController *mc = mport->drumController(ctl);
+							if (mc)
+								ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
+						}
+					}
+				}*/
+
+				processTrack(track);
+
+				song->insertTrack(track, -1);
+			}
+		}
+		if (first)
+		{
+			//
+			// track does only contain non-channel messages
+			// (SYSEX or META)
+			//
+			MidiTrack* track = new MidiTrack();
+			track->setMasterFlag(true);
+			track->setOutChannel(0);
+			track->setOutPort(mPort);
+			EventList* mel = track->events();
+			//buildMidiEventList(mel, el, track, division, true);
+			// Do SysexMeta. Don't do loops.
+			buildMidiEventList(mel, el, track, division, true, false, false);
+			processTrack(track);
+			song->insertTrack(track, -1);
+		}
+		mPort++;
+		//FIXME: Provice a non-iterative way to do this using the new oomMidiPorts hash
+		//Or maintain a list of configured or inuse ports
+		while((&midiPorts[mPort])->device() && mPort < MIDI_PORTS)
+			mPort++;//Just incase we have a configured port after an empty one
+	}
+
+	if (!merge)
+	{
+		TrackList* tl = song->tracks();
+		if (!tl->empty())
+		{
+			Track* track = tl->front();
+			track->setSelected(true);
+		}
+		song->initLen();
+
+		int z, n;
+		AL::sigmap.timesig(0, z, n);
+
+		int tempo = tempomap.tempo(0);
+		transport->setTimesig(z, n);
+		transport->setTempo(tempo);
+
+		bool masterF = !tempomap.empty();
+		song->setMasterFlag(masterF);
+		transport->setMasterFlag(masterF);
+
+		song->updatePos();
+
+		composer->reset();
+	}
+	else
+	{
+		song->initLen();
+	}
+
+	return false;
+}/*}}}*/
 
 //---------------------------------------------------------
 //   processTrack

@@ -1734,9 +1734,9 @@ void Song::initLen()
 	_len = AL::sigmap.bar2tick(264, 0, 0); // default song len
 	for (iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
 	{
-		MidiTrack* track = dynamic_cast<MidiTrack*> (*t);
-		if (track == 0)
+		if (!(*t)->isMidiTrack())
 			continue;
+		MidiTrack* track = dynamic_cast<MidiTrack*> (*t);
 		PartList* parts = track->parts();
 		for (iPart p = parts->begin(); p != parts->end(); ++p)
 		{

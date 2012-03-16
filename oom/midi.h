@@ -66,8 +66,8 @@ QString midiMetaName(int);
 class EventList;
 class MPEventList;
 class MidiTrack;
-//extern void buildMidiEventList(EventList* mel, const MPEventList* el, MidiTrack* track, int division, bool);
-extern void buildMidiEventList(EventList* mel, const MPEventList* el, MidiTrack* track, int division, bool /*addSysexMeta*/, bool /*doLoops*/);
+//extern void buildMidiEventList(EventList* mel, const MPEventList* el, MidiTrack* track, int division, bool /*addSysexMeta*/, bool /*doLoops*/);
+extern void buildMidiEventList(EventList*, const MPEventList*, MidiTrack*, int div, bool addSysex, bool doLoops, bool matchPort = true);
 // extern bool checkSysex(MidiTrack* track, unsigned int len, unsigned char* buf);
 
 #endif

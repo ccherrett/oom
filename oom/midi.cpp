@@ -249,7 +249,7 @@ QString nameSysex(unsigned int len, const unsigned char* buf)
 //---------------------------------------------------------
 
 void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
-		int div, bool addSysexMeta, bool doLoops)
+		int div, bool addSysexMeta, bool doLoops, bool matchPort)
 {
 	int hbank = 0xff;
 	int lbank = 0xff;
@@ -266,11 +266,11 @@ void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
 		MidiPlayEvent ev = *i;
 		if (!addSysexMeta && (ev.type() == ME_SYSEX || ev.type() == ME_META))
 			continue;
-		if (!(ev.type() == ME_SYSEX || ev.type() == ME_META
-				|| ((ev.channel() == track->outChannel()) && (ev.port() == track->outPort()))))
+		if (!(ev.type() == ME_SYSEX || ev.type() == ME_META || ((ev.channel() == track->outChannel()))))
+			continue;
+		if((matchPort && (ev.port() != track->outPort())))
 			continue;
 		unsigned tick = ev.time();
-		// Added by Tim. p3.3.8
 
 		// Added by T356.
 		if (doLoops)
@@ -290,9 +290,7 @@ void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
 				{
 					if (cmode == Song::CYCLE_REPLACE && loopn < loopc)
 					{
-						// Added by Tim. p3.3.8
 						//printf("buildMidiEventList: CYCLE_REPLACE t:%d type:%d A:%d B:%d ln:%d lc:%d\n", tick, ev.type(), ev.dataA(), ev.dataB(), loopn, loopc);
-
 						continue;
 					}
 					// If we want NORMAL, same as REPLACE except keep all events from the previous loop
@@ -303,9 +301,7 @@ void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
 						unsigned endRec = audio->getEndRecordPos().tick();
 						if ((tick < endRec && loopn < loopc) || (tick >= endRec && loopn < (loopc - 1)))
 						{
-							// Added by Tim. p3.3.8
 							//printf("buildMidiEventList: CYCLE_NORMAL t:%d type:%d A:%d B:%d ln:%d lc:%d\n", tick, ev.type(), ev.dataA(), ev.dataB(), loopn, loopc);
-
 							continue;
 						}
 					}
@@ -502,12 +498,12 @@ void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
 						song->addMarker(QString((const char*) (data)), ltick, false);
 					}
 						break;
+					//TODO implement text part to deal with this, would be a nice feature
 					case 0x5: // Lyrics
 					case 0x8: // text
 					case 0x9:
 					case 0xa:
 						break;
-
 					case 0x0f: // Track Comment
 						track->setComment(QString((char*) data));
 						break;
