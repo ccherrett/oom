@@ -1449,12 +1449,16 @@ void Audio::processMidi()
 		//---------------------------------------------------
 		//    end all notes
 		//---------------------------------------------------
-
 		for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
 		{
 			MidiDevice* md = *imd;
 			MPEventList* playEvents = md->playEvents();
 			MPEventList* stuckNotes = md->stuckNotes();
+			if(playEvents->size())
+				qDebug("Audio::processMidi: State STOP: playEvents.size(%d), stuckNotes.size(%d)",
+					(int)playEvents->size(),
+					(int)stuckNotes->size()
+				);
 			for (iMPEvent k = stuckNotes->begin(); k != stuckNotes->end(); ++k)
 			{
 				MidiPlayEvent ev(*k);
