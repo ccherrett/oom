@@ -728,15 +728,20 @@ Pipeline::~Pipeline()
 //    give ownership of object plugin to Pipeline
 //---------------------------------------------------------
 
-void Pipeline::insert(BasePlugin* plugin, int index)
+int Pipeline::addPlugin(BasePlugin* plugin, int index)
 {
 	int s = size();
 	if(index >= s || index == -1)
+	{
 		push_back(plugin);
+		return s;
+	}
 	else
 	{
-    	remove(index);
-    	(*this)[index] = plugin;
+    	//remove(index);
+    	//(*this)[index] = plugin;
+    	insert(begin()+index, plugin);
+		return index;
 	}
 }
 

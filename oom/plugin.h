@@ -987,7 +987,7 @@ public:
     Pipeline();
     ~Pipeline();
 
-    void insert(BasePlugin* plugin, int index);
+    int addPlugin(BasePlugin* plugin, int index);
     void remove(int index);
     void removeAll();
 

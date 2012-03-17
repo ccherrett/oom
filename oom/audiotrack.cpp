@@ -176,7 +176,7 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
 
     if (plugin)
     {
-        efxPipe()->insert(plugin, idx);
+        idx = efxPipe()->addPlugin(plugin, idx);
         plugin->setId(idx);
         plugin->setTrack(this);
 
@@ -925,7 +925,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
          if (pi->readConfiguration(xml, false))
             delete pi;
          else
-            _efxPipe->insert(pi, -1);
+            _efxPipe->addPlugin(pi, -1);
     }
     else if (tag == "Lv2Plugin")
     {
@@ -935,7 +935,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
          if (pi->readConfiguration(xml, false))
             delete pi;
          else
-            _efxPipe->insert(pi, -1);
+            _efxPipe->addPlugin(pi, -1);
     }
     else if (tag == "VstPlugin")
     {
@@ -945,7 +945,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
          if (pi->readConfiguration(xml, false))
             delete pi;
          else
-            _efxPipe->insert(pi, -1);
+            _efxPipe->addPlugin(pi, -1);
     }
     else if (tag == "auxSend")
         readAuxSend(xml);

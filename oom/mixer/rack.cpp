@@ -541,8 +541,8 @@ void EffectRack::dropEvent(QDropEvent *event)/*{{{*/
 	Pipeline* pipe = track->efxPipe();
 	if (pipe)
 	{
-		int size = pipe->size();
-		if (idx < size)
+		//int size = pipe->size();
+		/*if (idx < size)
 		{
 			QWidget *sw = event->source();
 			if (sw)
@@ -571,7 +571,7 @@ void EffectRack::dropEvent(QDropEvent *event)/*{{{*/
 			{
 				return;
 			}
-		}
+		}*/
 
 		if (event->mimeData()->hasFormat("text/x-oom-plugin"))
 		{
