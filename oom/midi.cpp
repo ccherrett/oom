@@ -1471,7 +1471,7 @@ void Audio::processMidi()
 						(int)playEvents->size(),
 						(int)stuckNotes->size()
 					);*/
-				playEvents->clear();
+				//playEvents->clear();
 			}	
 			for (iMPEvent k = stuckNotes->begin(); k != stuckNotes->end(); ++k)
 			{
