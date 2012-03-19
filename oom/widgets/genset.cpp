@@ -24,6 +24,7 @@
 #include "mididev.h"
 #include "audio.h"
 #include "driver/jackaudio.h"
+#include "instruments/minstrument.h"
 #include "globals.h"
 #include "icons.h"
 
@@ -384,33 +385,51 @@ void GlobalSettingsConfig::apply()
 	config.loadVST = chkLoadVST->isChecked();
 	config.vstPaths = txtVSTPaths->text();
 
-	gInputList.clear();
+	//QList<QPair<int, QString> > oldList(gInputList);
 	bool hasPorts = !gInputListPorts.isEmpty();
+	gInputList.clear();
 	for(int i = 0; i < m_inputsModel->rowCount(); ++i)
 	{
 		QStandardItem* item = m_inputsModel->item(i);
-		if(item && item->checkState() == Qt::Checked)
+		if(item)
 		{
+			bool checked = (item->checkState() == Qt::Checked);
 			QPair<int, QString> pinfo = qMakePair(item->data(Qt::UserRole+2).toInt(), item->data(Qt::UserRole+1).toString());
 			if(hasPorts)
 			{
 				bool found = false;
-				for(int p = 0; p < gInputListPorts.size(); p++)
+				int p = 0;
+				MidiPort* mp = 0;
+				for(p = 0;p < gInputListPorts.size(); p++)
 				{
-					MidiPort* mp = &midiPorts[gInputListPorts.at(p)];
+					mp = &midiPorts[gInputListPorts.at(p)];
 					if(mp && mp->device()->name() == pinfo.second)
 					{
 						found = true;
 						break;
 					}
 				}
-				if(!found)
+				if(!checked)
+				{//Unconfigure
+					if(found && mp)
+					{
+						mp->setInstrument(registerMidiInstrument("GM"));
+						midiSeq->msgSetMidiDevice(mp, 0);
+						gInputListPorts.takeAt(p);
+					}
+				}
+				else 
 				{
-					oom->addGlobalInput(pinfo);
+					if(!found)
+						oom->addGlobalInput(pinfo);
+					gInputList.append(pinfo);
 				}
 			}
-
-			gInputList.append(pinfo);
+			else if(checked)
+			{
+				oom->addGlobalInput(pinfo);
+				gInputList.append(pinfo);
+			}
 		}
 	}
 
