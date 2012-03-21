@@ -847,6 +847,7 @@ QPixmap* automation_track_OffIcon;
 QPixmap* automation_track_OverIcon;
 QPixmap* instrument_track_OffIcon;
 QPixmap* instrument_track_OverIcon;
+QPixmap* instrument_track_ActiveIcon;
 
 QPixmap* instrument_OnIcon;
 QPixmap* instrument_OffIcon;
@@ -1693,6 +1694,7 @@ void initIcons()
 	  
       instrument_track_OffIcon                      = new MPIXMAP(":/images/icons/instrument_track_new_off.png", NULL);
       instrument_track_OverIcon                     = new MPIXMAP(":/images/icons/instrument_track_new_over.png", NULL);
+      instrument_track_ActiveIcon                   = new MPIXMAP(":/images/icons/input_note.png", NULL);
 	  
       instrument_OnIcon                             = new MPIXMAP(":/images/instrument_new_on.png", NULL);
       instrument_OffIcon                            = new MPIXMAP(":/images/instrument_new_off.png", NULL);

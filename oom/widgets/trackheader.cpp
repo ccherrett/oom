@@ -555,7 +555,7 @@ void TrackHeader::heartBeat()/*{{{*/
 					if (!m_midiDetect)
 					{
 						m_midiDetect = true;
-						m_btnInstrument->setIcon(QIcon(*instrument_track_OverIcon));
+						m_btnInstrument->setIcon(QIcon(*instrument_track_ActiveIcon));
 						//m_btnAutomation->setIcon(QIcon(*input_indicator_OnIcon));
 					}
 					break;
