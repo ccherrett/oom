@@ -1890,7 +1890,6 @@ void TrackHeader::initPan()/*{{{*/
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		//connect(m_pan, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
 		*/
-		//Track *in = m_track->inputTrack();
 		m_pan = new Knob(this);/*{{{*/
 		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 		m_pan->setRange(-1.0, +1.0);
@@ -1910,6 +1909,19 @@ void TrackHeader::initPan()/*{{{*/
 			m_panLayout->insertWidget(1, m_pan);
 		}
 		m_pan->show();
+		Track *in = m_track->inputTrack();
+		if(in)
+		{
+			double v = ((AudioTrack*) in)->pan();
+			m_pan->blockSignals(true);
+			m_pan->setValue(v);
+			m_pan->blockSignals(false);
+			panVal = v;
+			if(((AudioTrack*) in)->panFromAutomation())
+			{
+				midiMonitor->msgSendAudioOutputEvent((Track*)in, CTRL_PANPOT, v);
+			}
+		}
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		connect(m_pan, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
 		connect(m_pan, SIGNAL(sliderReleased(int)), SLOT(panReleased()));/*}}}*/

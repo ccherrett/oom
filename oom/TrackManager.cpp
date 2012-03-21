@@ -1398,7 +1398,7 @@ void TrackManager::removeTrack(qint64 id)/*{{{*/
 	}
 }/*}}}*/
 
-void TrackManager::removeSelectedTracks()
+void TrackManager::removeSelectedTracks()/*{{{*/
 {
 	QList<qint64> selected = song->selectedTracks();
 	if(selected.isEmpty())
@@ -1480,7 +1480,7 @@ void TrackManager::removeSelectedTracks()
 			audio->msgRemoveTrackGroup(idList, true);
 		}
 	}
-}
+}/*}}}*/
 
 bool TrackManager::removeTrack(VirtualTrack* vtrack)/*{{{*/
 {

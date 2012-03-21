@@ -103,26 +103,17 @@ void TrackEffects::setupAuxPanel()/*{{{*/
 {
 	if(!hasAux)
 		return;
-	Track *in = 0;
-	if(m_track->hasChildren())
+	if(m_track->isMidiTrack())
 	{
-		QList<qint64> *chain = m_track->audioChain();
-		for(int i = 0; i < chain->size(); i++)
-		{
-			in = song->findTrackByIdAndType(chain->at(i), Track::AUDIO_INPUT);
-			if(in)
-			{
-				break;
-			}
-		}
+		Track *in = m_track->inputTrack();
 		if(in)
 		{
-			QLabel* inputLabel = new QLabel(tr("Input Aux"));
-			m_auxBox->addWidget(inputLabel);
+			//QLabel* inputLabel = new QLabel(tr("Input Aux"));
+			//m_auxBox->addWidget(inputLabel);
 			populateAuxForTrack((AudioTrack*)in);
 		}
 	}
-	if(!m_track->isMidiTrack())
+	else
 	{//Populate my own aux send
 		QLabel* auxLabel = new QLabel(tr("Aux"));
 		m_auxBox->addWidget(auxLabel);

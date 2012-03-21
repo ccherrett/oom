@@ -679,13 +679,14 @@ void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
 	}
 	else
 	{
-		m_panKnob->setKnobImage(QString(":images/knob_midi_new.png"));
+		//m_panKnob->setKnobImage(QString(":images/knob_midi_new.png"));
+		m_panKnob->setKnobImage(QString(":images/knob_audio_new.png"));
 	}
 	m_panKnob->update();
 }/*}}}*/
 
 //Track type combo slot
-void CreateTrackDialog::trackTypeChanged(int type)
+void CreateTrackDialog::trackTypeChanged(int type)/*{{{*/
 {
 	Track::TrackType curtype = (Track::TrackType)m_insertType;
 	if(curtype == Track::MIDI && m_instrumentLoaded)
@@ -699,7 +700,7 @@ void CreateTrackDialog::trackTypeChanged(int type)
 	populateInstrumentList();
 	populateMonitorList();
 	populateBussList();
-}
+}/*}}}*/
 
 void CreateTrackDialog::trackNameEdited()
 {
@@ -1008,7 +1009,10 @@ void CreateTrackDialog::populateNewInputList()/*{{{*/
 	{
 		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
 		{
-			cmbInput->addItem((*i)->name(), MidiDevice::ALSA_MIDI);
+			if ((*i)->rwFlags() & 0x2)
+			{
+				cmbInput->addItem((*i)->name(), MidiDevice::ALSA_MIDI);
+			}
 		}
 	}
 	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
@@ -1084,7 +1088,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 	chkOutput->setEnabled(true);
 	chkInput->setChecked(true);
 	chkOutput->setChecked(true);
-	chkBuss->setChecked(true);
+	chkBuss->setChecked(false);
 	chkAutoCreate->setChecked(true);
 	cmbMonitor->setEnabled(true);
 	trackNameEdited();
