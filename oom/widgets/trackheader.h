@@ -23,6 +23,7 @@ class QResizeEvent;
 class QPoint;
 class Slider;
 class Meter;
+class TrackEffects;
 
 class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 {
@@ -32,6 +33,7 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	Track* m_track;
 	Knob* m_pan;
 	Slider* m_slider;
+	TrackEffects* m_effects;
 	bool resizeFlag;
 	bool m_selected;
     bool m_midiDetect;

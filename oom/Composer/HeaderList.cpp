@@ -639,6 +639,7 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 						t = Track::WAVE;
 						QFileInfo f(text);
 						track = song->addTrackByName(f.baseName(), Track::WAVE, -1, true, true);
+						song->updateTrackViews();
 					}
 					else
 					{

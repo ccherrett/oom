@@ -156,6 +156,7 @@ class ComposerCanvas : public Canvas
 	void drawTooltipText(QPainter& p, const QRect& rr, int height, double lazySelNodeVal, double lazySelNodePrevVal, int lazySelNodeFrame, bool paintAsDb, CtrlList*);
 
     void checkAutomation(Track * t, const QPoint& pointer, bool addNewCtrl);
+	bool checkAutomationForTrack(Track * t, const QPoint &pointer, bool addNewCtrl, Track *rt = 0);
     void selectAutomation(Track * t, const QPoint& pointer);
     void processAutomationMovements(QMouseEvent *event);    
     void addNewAutomation(QMouseEvent *event);    

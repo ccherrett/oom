@@ -1212,6 +1212,7 @@ bool Song::event(QEvent* _e)
 		}
 		case QPybridgeEvent::SONG_ADD_TRACK:
 			song->addTrack(e->getP1());
+			song->updateTrackViews();
 			break;
 		case QPybridgeEvent::SONG_CHANGE_TRACKNAME:
 		{

@@ -22,8 +22,13 @@ class AutomationMenu : public QWidgetAction
 {
 	Q_OBJECT
 	QListView *list;
+	QListView *m_inputList;
+	QStandardItemModel *m_inputListModel;
 	QStandardItemModel *m_listModel;
 	Track* m_track;
+	Track* m_synthTrack;
+	Track* m_inputTrack;
+	CtrlListList* m_inputControllers;
 	CtrlListList* m_controllers;
 
 	public:
@@ -31,7 +36,8 @@ class AutomationMenu : public QWidgetAction
 		virtual QWidget* createWidget(QWidget* parent = 0);
 
 	private slots:
-		void itemClicked(const QModelIndex&);
+		void inputItemClicked(const QModelIndex&);
+		void itemClicked(const QModelIndex&, bool isInput = false);
 	
 	signals:
 		void triggered();

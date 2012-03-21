@@ -413,6 +413,7 @@ void GlobalSettingsConfig::apply()
 				{//Unconfigure
 					if(found && mp)
 					{
+						//TODO:Clear routing list
 						mp->setInstrument(registerMidiInstrument("GM"));
 						midiSeq->msgSetMidiDevice(mp, 0);
 						gInputListPorts.takeAt(p);

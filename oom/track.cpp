@@ -415,6 +415,20 @@ QString Track::getValidName(QString base, bool dname)
 	return rv;
 }
 
+Track* Track::inputTrack()
+{
+	Track* in = 0;
+	foreach(qint64 i, m_audioChain)
+	{
+		in = song->findTrackByIdAndType(i, AUDIO_INPUT);
+		if(in)
+		{
+			break;
+		}
+	}
+	return in;
+}
+
 void Track::deselectParts()
 {
 	for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
@@ -653,6 +667,7 @@ void MidiTrack::init()
 	_recEcho = true;
 	transpose = false;
 	m_samplerData = 0;
+	m_masterFlag = true; //Midi tracks should always be master
 
 	m_midiassign.enabled = false;
 	m_midiassign.port = 0;

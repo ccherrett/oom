@@ -878,7 +878,7 @@ void MidiInstrument::write(int level, Xml& xml)
 	xml.header();
 	xml.tag(level, "oom version=\"1.0\"");
 	level++;
-	xml.nput(level, "<MidiInstrument name=\"%s\" oomInstrument=\"%d\" panValue=\"%d\" verbValue=\"%d\"", 
+	xml.nput(level, "<MidiInstrument name=\"%s\" oomInstrument=\"%d\" panValue=\"%f\" verbValue=\"%f\"", 
 			Xml::xmlString(iname()).toLatin1().constData(), m_oomInstrument, m_panValue, m_verbValue);
 
 	if (_nullvalue != -1)

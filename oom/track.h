@@ -211,6 +211,7 @@ public:
 	{
 		return !m_audioChain.isEmpty();
 	}
+	Track* inputTrack();
 
 	MidiAssignData* midiAssign() { return &m_midiassign; }
 

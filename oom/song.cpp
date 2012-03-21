@@ -324,6 +324,14 @@ Track* Song::addTrack(int t, bool doUndo)/*{{{*/
 	// Add default track <-> midiport routes.
 	if (track->isMidiTrack())
 	{
+		//Create the Audio input side of the track
+		Track* input = addTrackByName(QString("i").append(track->name()), Track::AUDIO_INPUT, -1, false, false);
+		if(input)
+		{
+			input->setMasterFlag(false);
+			input->setChainMaster(track->id());
+			track->addManagedTrack(input->id());
+		}
 		MidiTrack* mt = (MidiTrack*) track;
 		int c, cbi, ch;
 		bool defOutFound = false; /// TODO: Remove this when multiple out routes supported.
@@ -378,7 +386,7 @@ Track* Song::addTrack(int t, bool doUndo)/*{{{*/
 		}
 	}
 	audio->msgUpdateSoloStates();
-	updateTrackViews();
+	//updateTrackViews();
 	return track;
 }/*}}}*/
 
@@ -450,6 +458,14 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool doUndo, bool conn
 	// Add default track <-> midiport routes.
 	if (track->isMidiTrack())
 	{
+		//Create the Audio input side of the track
+		Track* input = addTrackByName(QString("i").append(track->name()), Track::AUDIO_INPUT, -1, false, false);
+		if(input)
+		{
+			input->setMasterFlag(false);
+			input->setChainMaster(track->id());
+			track->addManagedTrack(input->id());
+		}
 		MidiTrack* mt = (MidiTrack*) track;
 		int c, cbi, ch;
 		bool defOutFound = false; /// TODO: Remove this when multiple out routes supported.
@@ -514,7 +530,7 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool doUndo, bool conn
 		}
 	}
 	audio->msgUpdateSoloStates();
-	updateTrackViews();
+	//updateTrackViews();
 	return track;
 }/*}}}*/
 

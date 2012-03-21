@@ -147,7 +147,7 @@ QFrame#propertiesFrame, QFrame#frame2, QSplitter#splitter5, QSplitter#splitter6,
 QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup,
 GlobalSettingsConfig QLabel, CreateTrackDialog QLabel, EditInstrument QLabel, LSCPImport QLabel,
 TrackViewEditor QLabel, MixdownFileDialog QLabel, QLabel#TrackInstrumentMenuHeader,
-QLabel#AutomationMenuHeader
+QLabel#AutomationMenuHeader, TrackEffects QLabel
 {
 	background-color:none;
 	border:none;
@@ -758,7 +758,8 @@ QFrame#MixerWaveStrip,
 QFrame#MixerAudioBussStrip, 
 QFrame#MixerAuxStrip, 
 QFrame#MixerAudioOutStrip, 
-QFrame#MidiTrackStrip { 
+QFrame#MidiTrackStrip
+{ 
 	border-right: 1px solid #888888;
 	background-color: #1b1b1b;
 	border-radius: 7px;
@@ -768,7 +769,9 @@ QFrame#MixerWaveAuxbox,
 QFrame#MixerAudioBussAuxbox, 
 QFrame#MixerAuxAuxbox, 
 QFrame#MixerAudioOutAuxbox, 
-QFrame#MidiTrackAuxbox { 
+QFrame#MidiTrackAuxbox, 
+QFrame#EffectsAuxbox 
+{ 
 	border: 1px solid #29292a;
 	background-color: #141414;
 }

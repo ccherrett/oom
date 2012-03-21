@@ -496,6 +496,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				rv = m_track->id();
 			}
 			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
+			song->updateTrackViews();
 		}
 		break;
 		case Track::WAVE:
@@ -574,6 +575,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				
 			}
 			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
+			song->updateTrackViews();
 		}
 		break;
 		case Track::AUDIO_OUTPUT:
@@ -645,6 +647,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				rv = m_track->id();
 			}
 			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
+			song->updateTrackViews();
 		}
 		break;
 		case Track::AUDIO_INPUT:
@@ -706,6 +709,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				rv = m_track->id();
 			}
 			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
+			song->updateTrackViews();
 		}
 		break;
 		case Track::AUDIO_BUSS:
@@ -743,6 +747,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				rv = m_track->id();
 			}
 			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
+			song->updateTrackViews();
 		}
 		break;
 		case Track::AUDIO_AUX:
@@ -770,6 +775,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				rv = m_track->id();
 			}
 			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
+			song->updateTrackViews();
 		}
 		break;
 		default:
@@ -1655,7 +1661,9 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 	QString inputName = QString("i").append(name);
 	QString bussName = QString("B").append(name);
 	//QString audioName = QString("A-").append(name);
-	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
+	//if(m_track)
+	Track* input = m_track->inputTrack();
+	//Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
 	Track* buss = 0;
 	if(vtrack->useBuss)
 	{
