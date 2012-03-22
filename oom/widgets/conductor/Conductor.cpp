@@ -265,7 +265,7 @@ Conductor::~Conductor()
 //   heartBeat
 //---------------------------------------------------------
 
-void Conductor::heartBeat()
+void Conductor::heartBeat()/*{{{*/
 {
 	if (!isVisible() || !isEnabled() || !selected)
 		return;
@@ -564,7 +564,7 @@ void Conductor::heartBeat()
 		case Track::AUDIO_SOFTSYNTH:
 			break;
 	}
-}
+}/*}}}*/
 
 void Conductor::toggleSynthGui(bool on)
 {
@@ -724,7 +724,7 @@ void Conductor::routingPopupViewActivated(const QModelIndex& mdi)
 //   inRoutesPressed
 //---------------------------------------------------------
 
-void Conductor::inRoutesPressed()
+void Conductor::inRoutesPressed()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -759,13 +759,13 @@ void Conductor::inRoutesPressed()
 	//pup->setVisible(true);
 	iRButton->setDown(false);
 	return;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   outRoutesPressed
 //---------------------------------------------------------
 
-void Conductor::outRoutesPressed()
+void Conductor::outRoutesPressed()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -783,13 +783,13 @@ void Conductor::outRoutesPressed()
 	pup->popup(QCursor::pos());
 	///oRButton->setDown(false);
 	return;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iProgHBankChanged
 //---------------------------------------------------------
 
-void Conductor::iProgHBankChanged()
+void Conductor::iProgHBankChanged()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -870,13 +870,13 @@ void Conductor::iProgHBankChanged()
 		emit patchChanged(new Patch);
 	}
 	//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iProgLBankChanged
 //---------------------------------------------------------
 
-void Conductor::iProgLBankChanged()
+void Conductor::iProgLBankChanged()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -957,13 +957,13 @@ void Conductor::iProgLBankChanged()
 	{
 		emit patchChanged(new Patch);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iProgramChanged
 //---------------------------------------------------------
 
-void Conductor::iProgramChanged()
+void Conductor::iProgramChanged()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -1047,13 +1047,13 @@ void Conductor::iProgramChanged()
 	}
 
 	//      updateConductor();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iLautstChanged
 //---------------------------------------------------------
 
-void Conductor::iLautstChanged(int val)
+void Conductor::iLautstChanged(int val)/*{{{*/
 {
 	if (!selected)
 		return;
@@ -1075,7 +1075,7 @@ void Conductor::iLautstChanged(int val)
 		audio->msgPlayMidiEvent(&ev);
 	}
 	song->update(SC_MIDI_CONTROLLER);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iTranspChanged
@@ -1109,59 +1109,59 @@ void Conductor::transposeStateChanged(bool state)
 //   iAnschlChanged
 //---------------------------------------------------------
 
-void Conductor::iAnschlChanged(int val)
+void Conductor::iAnschlChanged(int val)/*{{{*/
 {
 	if (!selected)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 	track->velocity = val;
 	song->update(SC_MIDI_TRACK_PROP);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iVerzChanged
 //---------------------------------------------------------
 
-void Conductor::iVerzChanged(int val)
+void Conductor::iVerzChanged(int val)/*{{{*/
 {
 	if (!selected)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 	track->delay = val;
 	song->update(SC_MIDI_TRACK_PROP);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iLenChanged
 //---------------------------------------------------------
 
-void Conductor::iLenChanged(int val)
+void Conductor::iLenChanged(int val)/*{{{*/
 {
 	if (!selected)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 	track->len = val;
 	song->update(SC_MIDI_TRACK_PROP);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iKomprChanged
 //---------------------------------------------------------
 
-void Conductor::iKomprChanged(int val)
+void Conductor::iKomprChanged(int val)/*{{{*/
 {
 	if (!selected)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 	track->compression = val;
 	song->update(SC_MIDI_TRACK_PROP);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iPanChanged
 //---------------------------------------------------------
 
-void Conductor::iPanChanged(int val)
+void Conductor::iPanChanged(int val)/*{{{*/
 {
 	if (!selected)
 		return;
@@ -1184,7 +1184,7 @@ void Conductor::iPanChanged(int val)
 		audio->msgPlayMidiEvent(&ev);
 	}
 	song->update(SC_MIDI_CONTROLLER);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   instrPopup
@@ -1199,20 +1199,20 @@ void Conductor::instrPopup()
 //   recEchoToggled
 //---------------------------------------------------------
 
-void Conductor::recEchoToggled(bool v)
+void Conductor::recEchoToggled(bool v)/*{{{*/
 {
 	if (!selected)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 	track->setRecEcho(v);
 	song->update(SC_MIDI_TRACK_PROP);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iProgramDoubleClicked
 //---------------------------------------------------------
 
-void Conductor::iProgramDoubleClicked()
+void Conductor::iProgramDoubleClicked()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -1264,13 +1264,13 @@ void Conductor::iProgramDoubleClicked()
 	}
 
 	song->update(SC_MIDI_CONTROLLER);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iLautstDoubleClicked
 //---------------------------------------------------------
 
-void Conductor::iLautstDoubleClicked()
+void Conductor::iLautstDoubleClicked()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -1322,13 +1322,13 @@ void Conductor::iLautstDoubleClicked()
 	}
 
 	song->update(SC_MIDI_CONTROLLER);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   iPanDoubleClicked
 //---------------------------------------------------------
 
-void Conductor::iPanDoubleClicked()
+void Conductor::iPanDoubleClicked()/*{{{*/
 {
 	if (!selected)
 		return;
@@ -1380,7 +1380,7 @@ void Conductor::iPanDoubleClicked()
 	}
 
 	song->update(SC_MIDI_CONTROLLER);
-}
+}/*}}}*/
 
 void Conductor::generateInstrumentMenu()/*{{{*/
 {

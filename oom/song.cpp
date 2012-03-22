@@ -367,6 +367,23 @@ Track* Song::addTrack(int t, bool doUndo)/*{{{*/
 			}
 		}
 	}
+	else if(track->type() == Track::WAVE)
+	{
+		//Create the Audio input side of the track
+		Track* input = addTrackByName(QString("i").append(track->name()), Track::AUDIO_INPUT, -1, false, false);
+		if(input)
+		{
+			input->setMasterFlag(false);
+			input->setChainMaster(track->id());
+			track->addManagedTrack(input->id());
+			
+			//Route the input to the wave track
+			Route srcRoute(input->name(), true, -1);
+			Route dstRoute(track, 0, track->channels());
+			audio->msgAddRoute(srcRoute, dstRoute);
+			updateFlags |= SC_ROUTE;
+		}
+	}
 
 	//
 	//  add default route to master
@@ -506,6 +523,23 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool doUndo, bool conn
 #endif
 				}
 			}
+		}
+	}
+	else if(track->type() == Track::WAVE)
+	{
+		//Create the Audio input side of the track
+		Track* input = addTrackByName(QString("i").append(track->name()), Track::AUDIO_INPUT, -1, false, false);
+		if(input)
+		{
+			input->setMasterFlag(false);
+			input->setChainMaster(track->id());
+			track->addManagedTrack(input->id());
+			
+			//Route the input to the wave track
+			Route srcRoute(input->name(), true, -1);
+			Route dstRoute(track, 0, track->channels());
+			audio->msgAddRoute(srcRoute, dstRoute);
+			updateFlags |= SC_ROUTE;
 		}
 	}
 

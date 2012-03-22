@@ -115,15 +115,15 @@ void TrackEffects::setupAuxPanel()/*{{{*/
 	}
 	else
 	{//Populate my own aux send
-		QLabel* auxLabel = new QLabel(tr("Aux"));
-		m_auxBox->addWidget(auxLabel);
+		//QLabel* auxLabel = new QLabel(tr("Aux"));
+		//m_auxBox->addWidget(auxLabel);
 		populateAuxForTrack((AudioTrack*)m_track);
 	}
 }/*}}}*/
 
-void TrackEffects::populateAuxForTrack(AudioTrack* t)
+void TrackEffects::populateAuxForTrack(AudioTrack* t)/*{{{*/
 {
-	if (t && t->hasAuxSend())/*{{{*/
+	if (t && t->hasAuxSend())
 	{
 		AuxProxy *proxy = new AuxProxy(t);
 		int idx = 0;
@@ -151,8 +151,8 @@ void TrackEffects::populateAuxForTrack(AudioTrack* t)
 			++iter;
 		}
 		m_proxy.insert(t->id(), proxy);
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
 void TrackEffects::setTrack(Track* t)
 {

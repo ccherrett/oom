@@ -174,6 +174,7 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 	
 	m_effects = new TrackEffects(m_track, this);
 	m_effects->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	m_effects->installEventFilter(this);
 	m_controlsBox->addWidget(m_effects);
 	connect(song, SIGNAL(songChanged(int)), m_effects, SLOT(songChanged(int)));
 
@@ -974,7 +975,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{//Insert after
 				int mypos = song->tracks()->index(m_track);
 				CreateTrackDialog *ctdialog = new CreateTrackDialog(Track::MIDI, ++mypos, this);
-				connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+				connect(ctdialog, SIGNAL(trackAdded(qint64)), this, SLOT(newTrackAdded(qint64)));
 				ctdialog->exec();
 				break;
 			}

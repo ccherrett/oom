@@ -512,8 +512,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					QString inputName = QString("i").append(m_track->name());
 					QString selectedInput = vtrack->inputConfig.second;
 					bool addNewRoute = vtrack->inputConfig.first;
-					Track* input = 0;
-					if(addNewRoute)
+					Track* input = m_track->inputTrack();
+					/*if(addNewRoute)
 					{
 						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
 						if(input)
@@ -524,7 +524,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						}
 					}
 					else
-						input = song->findTrack(selectedInput);
+						input = song->findTrack(selectedInput);*/
 					if(input)
 					{
 						song->undoOp(UndoOp::AddTrack, -1, input);
@@ -548,13 +548,14 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						}
 						
 						//Connect input track to audio track
-						Route srcRoute(input->name(), true, -1);
+						//Already done in song->addTrackByName
+						/*Route srcRoute(input->name(), true, -1);
 						Route dstRoute(m_track, 0, m_track->channels());
 
 						audio->msgAddRoute(srcRoute, dstRoute);
 
 						audio->msgUpdateSoloStates();
-						song->update(SC_ROUTE);
+						song->update(SC_ROUTE);*/
 					}
 				}
 				if(vtrack->useOutput)

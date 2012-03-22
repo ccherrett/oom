@@ -33,7 +33,6 @@
 //#define NODE_DEBUG 
 //#define FIFO_DEBUG 
 
-// Added by Tim. p3.3.18
 //#define METRONOME_DEBUG 
 
 //---------------------------------------------------------
@@ -684,13 +683,11 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 
 void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int srcChannels, unsigned nframes, float** dstBuffer)
 {
-	//Changed by T356. 12/12/09.
 	// Overhaul and streamline to eliminate multiple processing during one process loop.
 	// Was causing ticking sound with synths + multiple out routes because synths were being processed multiple times.
 	// Make better use of AudioTrack::outBuffers as a post-effect pre-volume cache system for multiple calls here during processing.
 	// Previously only WaveTrack used them. (Changed WaveTrack as well).
 
-	//Added by Tim. p3.3.16
 #ifdef NODE_DEBUG
 	printf("OOMidi: AudioTrack::addData name:%s processed:%d\n", name().toLatin1().constData(), processed());
 #endif
@@ -1324,7 +1321,8 @@ void AudioTrack::record()
 
 		if (fifo.get(_channels, segmentSize, buffer, &pos))
 		{
-			printf("AudioTrack::record(): empty fifo\n");
+			if(debugMsg)
+				printf("AudioTrack::record(): empty fifo\n");
 			return;
 		}
 		if (_recFile)
@@ -1472,18 +1470,12 @@ void AudioOutput::processWrite()
 				putFifo(_channels, _nframes, buffer);
 		}
 	}
-	// Changed by Tim. p3.3.18
-	//if (audioClickFlag && song->click()) {
 	if (sendMetronome() && audioClickFlag && song->click())
 	{
 
-		// Added by Tim. p3.3.18
 #ifdef METRONOME_DEBUG
 		printf("OOMidi: AudioOutput::processWrite Calling metronome->addData frame:%u channels:%d frames:%lu\n", audio->pos().frame(), _channels, _nframes);
 #endif
-
-		// p3.3.38
-		//metronome->addData(audio->pos().frame(), _channels, _nframes, buffer);
 		metronome->addData(audio->pos().frame(), _channels, -1, -1, _nframes, buffer);
 	}
 }
@@ -1551,14 +1543,14 @@ Fifo::~Fifo()
 
 bool Fifo::put(int segs, unsigned long samples, float** src, unsigned pos)
 {
-	// Added by Tim. p3.3.17
 #ifdef FIFO_DEBUG
 	printf("FIFO::put segs:%d samples:%lu pos:%u\n", segs, samples, pos);
 #endif
 
 	if (oom_atomic_read(&count) == nbuffer)
 	{
-		printf("FIFO %p overrun... %d\n", this, count.counter);
+		if(debugMsg)
+			printf("FIFO %p overrun... %d\n", this, count.counter);
 		return true;
 	}
 	FifoBuffer* b = buffer[widx];
@@ -1567,16 +1559,11 @@ bool Fifo::put(int segs, unsigned long samples, float** src, unsigned pos)
 	{
 		if (b->buffer)
 		{
-			// Changed by Tim. p3.3.15
 			//delete[] b->buffer;
 			free(b->buffer);
-			// p3.3.45
 			b->buffer = 0;
 		}
-		// Changed by Tim. p3.3.15
-		//b->buffer  = new float[n];
 		posix_memalign((void**) &(b->buffer), 16, sizeof (float) * n);
-		// p3.3.45
 		if (!b->buffer)
 		{
 			printf("Fifo::put could not allocate buffer segs:%d samples:%lu pos:%u\n", segs, samples, pos);
@@ -1609,21 +1596,21 @@ bool Fifo::put(int segs, unsigned long samples, float** src, unsigned pos)
 
 bool Fifo::get(int segs, unsigned long samples, float** dst, unsigned* pos)
 {
-	// Added by Tim. p3.3.17
 #ifdef FIFO_DEBUG
 	printf("FIFO::get segs:%d samples:%lu\n", segs, samples);
 #endif
 
 	if (oom_atomic_read(&count) == 0)
 	{
-		printf("FIFO %p underrun... %d\n", this, count.counter); //by willyfoobar: added count to output //see Fifo::put()
+		if(debugMsg)
+			printf("FIFO %p underrun... %d\n", this, count.counter);
 		return true;
 	}
 	FifoBuffer* b = buffer[ridx];
-	// p3.3.45
 	if (!b->buffer)
 	{
-		printf("Fifo::get no buffer! segs:%d samples:%lu b->pos:%u\n", segs, samples, b->pos);
+		if(debugMsg)
+			printf("Fifo::get no buffer! segs:%d samples:%lu b->pos:%u\n", segs, samples, b->pos);
 		return true;
 	}
 
@@ -1656,7 +1643,6 @@ void Fifo::remove()
 
 bool Fifo::getWriteBuffer(int segs, unsigned long samples, float** buf, unsigned pos)
 {
-	// Added by Tim. p3.3.17
 #ifdef FIFO_DEBUG
 	printf("Fifo::getWriteBuffer segs:%d samples:%lu pos:%u\n", segs, samples, pos);
 #endif
@@ -1669,17 +1655,11 @@ bool Fifo::getWriteBuffer(int segs, unsigned long samples, float** buf, unsigned
 	{
 		if (b->buffer)
 		{
-			// Changed by Tim. p3.3.15
-			//delete[] b->buffer;
 			free(b->buffer);
-			// p3.3.45
 			b->buffer = 0;
 		}
 
-		// Changed by Tim. p3.3.15
-		//b->buffer = new float[n];
 		posix_memalign((void**) &(b->buffer), 16, sizeof (float) * n);
-		// p3.3.45
 		if (!b->buffer)
 		{
 			printf("Fifo::getWriteBuffer could not allocate buffer segs:%d samples:%lu pos:%u\n", segs, samples, pos);

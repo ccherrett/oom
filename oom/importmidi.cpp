@@ -354,6 +354,7 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 				if (i == el->end())
 					continue;
 				MidiTrack* track = new MidiTrack();
+				track->setDefaultName();
 				track->setMasterFlag(true);
 				/*if ((*t)->isDrumTrack)
 				{
@@ -371,6 +372,7 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 				//buildMidiEventList(mel, el, track, division, first);
 				// Don't do loops.
 				buildMidiEventList(mel, el, track, division, first, false, false);
+
 				first = false;
 
 				// Hmm. buildMidiEventList already takes care of this.
@@ -404,6 +406,14 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 				processTrack(track);
 
 				song->insertTrack(track, -1);
+				//Create the Audio input side of the track
+				Track* input = song->addTrackByName(QString("i").append(track->name()), Track::AUDIO_INPUT, -1, false, false);
+				if(input)
+				{
+					input->setMasterFlag(false);
+					input->setChainMaster(track->id());
+					track->addManagedTrack(input->id());
+				}
 			}
 		}
 		if (first)
@@ -413,6 +423,7 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 			// (SYSEX or META)
 			//
 			MidiTrack* track = new MidiTrack();
+			track->setDefaultName();
 			track->setMasterFlag(true);
 			track->setOutChannel(0);
 			track->setOutPort(mPort);
@@ -422,6 +433,14 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 			buildMidiEventList(mel, el, track, division, true, false, false);
 			processTrack(track);
 			song->insertTrack(track, -1);
+			//Create the Audio input side of the track
+			Track* input = song->addTrackByName(QString("i").append(track->name()), Track::AUDIO_INPUT, -1, false, false);
+			if(input)
+			{
+				input->setMasterFlag(false);
+				input->setChainMaster(track->id());
+				track->addManagedTrack(input->id());
+			}
 		}
 		mPort++;
 		//FIXME: Provice a non-iterative way to do this using the new oomMidiPorts hash

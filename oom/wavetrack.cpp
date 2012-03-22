@@ -280,8 +280,10 @@ bool WaveTrack::getData(unsigned framePos, int channels, unsigned nframe, float*
 				else
 				{
 					if (fifo.put(channels, nframe, bp, audio->pos().frame()))
-						printf("WaveTrack::getData(%d, %d, %d): fifo overrun\n",
-							framePos, channels, nframe);
+					{
+						if(debugMsg)
+							printf("WaveTrack::getData(%d, %d, %d): fifo overrun\n", framePos, channels, nframe);
+					}
 				}
 			}
 			return true;
@@ -307,7 +309,8 @@ bool WaveTrack::getData(unsigned framePos, int channels, unsigned nframe, float*
 		unsigned pos;
 		if (_prefetchFifo.get(channels, nframe, bp, &pos))
 		{
-			printf("WaveTrack::getData(%s) fifo underrun\n", name().toLatin1().constData());
+			if(debugMsg)
+				printf("WaveTrack::getData(%s) fifo underrun\n", name().toLatin1().constData());
 			return false;
 		}
 		if (pos != framePos)
@@ -318,7 +321,8 @@ bool WaveTrack::getData(unsigned framePos, int channels, unsigned nframe, float*
 			{
 				if (_prefetchFifo.get(channels, nframe, bp, &pos))
 				{
-					printf("WaveTrack::getData(%s) fifo underrun\n", name().toLatin1().constData());
+					if(debugMsg)
+						printf("WaveTrack::getData(%s) fifo underrun\n", name().toLatin1().constData());
 					return false;
 				}
 			}

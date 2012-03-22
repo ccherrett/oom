@@ -14,6 +14,14 @@
 class Xml;
 class Track;
 
+struct PortConfig 
+{
+	int first;
+	qint64 id;
+	QString left;
+	QString right;
+};
+
 struct VirtualTrack {
 
 	VirtualTrack();

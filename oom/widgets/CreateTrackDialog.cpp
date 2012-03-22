@@ -720,6 +720,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		case Track::DRUM:
 		{
 			m_currentMidiInputList.clear();
+			m_currentInput.clear();
 			cmbInput->addItem(tr("My Inputs"), 1025);
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{
@@ -732,10 +733,12 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 				if ((md->openFlags() & 2))
 				{
 					QString mdname(md->name());
-					if(md->deviceType() == MidiDevice::ALSA_MIDI)
-					{
-						mdname = QString("(OOMidi) ").append(mdname);
-					}
+					m_currentInput.append(mdname);
+					//if(md->deviceType() == MidiDevice::ALSA_MIDI)
+					//{
+						//Put it in the alsa list
+					//}
+					mdname = QString("(OOStudio) ").append(mdname);
 					cmbInput->addItem(mdname, i);
 					m_currentMidiInputList.insert(cmbInput->count()-1, mdname);
 				}
@@ -751,10 +754,12 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		break;
 		case Track::WAVE:
 		{
-			for(iTrack it = song->inputs()->begin(); it != song->inputs()->end(); ++it)
+			//The track now has its own input on creation so dont bother showing other input
+			//to connect to it
+			/*for(iTrack it = song->inputs()->begin(); it != song->inputs()->end(); ++it)
 			{
 				cmbInput->addItem((*it)->name(), 0);
-			}
+			}*/
 			importOutputs();
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
@@ -830,6 +835,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 		case Track::DRUM:
 		{
 			m_currentMidiOutputList.clear();
+			m_currentOutput.clear();
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{
 				MidiPort* mp = &midiPorts[i];
@@ -841,10 +847,11 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 				if((md->openFlags() & 1))
 				{
 					QString mdname(md->name());
-					if(md->deviceType() == MidiDevice::ALSA_MIDI)
-					{
-						mdname = QString("(OOStudio) ").append(mdname);
-					}
+					m_currentOutput.append(mdname);
+					//if(md->deviceType() == MidiDevice::ALSA_MIDI)
+					//{
+					//}
+					mdname = QString("(OOStudio) ").append(mdname);
 					cmbOutput->addItem(mdname, i);
 					m_currentMidiOutputList.insert(cmbOutput->count()-1, mdname);
 				}
@@ -1011,7 +1018,10 @@ void CreateTrackDialog::populateNewInputList()/*{{{*/
 		{
 			if ((*i)->rwFlags() & 0x2)
 			{
-				cmbInput->addItem((*i)->name(), MidiDevice::ALSA_MIDI);
+				//Dont add any ALSA ports that are already configured
+				//An alsa device can only be connected to 1 OOM MidiPort
+				if(m_currentInput.isEmpty() || !m_currentInput.contains((*i)->name()))
+					cmbInput->addItem((*i)->name(), MidiDevice::ALSA_MIDI);
 			}
 		}
 	}
@@ -1020,18 +1030,33 @@ void CreateTrackDialog::populateNewInputList()/*{{{*/
 	std::list<QString> sl = audioDevice->outputPorts(true, m_showJackAliases);
 	for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)
 	{
-		cmbInput->addItem(*ip, MidiDevice::JACK_MIDI);
+		if(m_currentInput.isEmpty() || !m_currentInput.contains(*ip))
+			cmbInput->addItem(*ip, MidiDevice::JACK_MIDI);
 	}
 }/*}}}*/
 
 void CreateTrackDialog::populateNewOutputList()/*{{{*/
 {
+	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)/*{{{*/
+	{
+		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
+		{
+			if ((*i)->rwFlags() & 0x1)
+			{
+				//Dont add any ALSA ports that are already configured
+				//An alsa device can only be connected to 1 OOM MidiPort
+				if(m_currentOutput.isEmpty() || !m_currentOutput.contains((*i)->name()))
+					cmbOutput->addItem((*i)->name(), MidiDevice::ALSA_MIDI);
+			}
+		}
+	}/*}}}*/
 	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
 		return;
 	std::list<QString> sl = audioDevice->inputPorts(true, m_showJackAliases);
 	for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)
 	{
-		cmbOutput->addItem(*ip, MidiDevice::JACK_MIDI);
+		if(m_currentOutput.isEmpty() || !m_currentOutput.contains(*ip))
+			cmbOutput->addItem(*ip, MidiDevice::JACK_MIDI);
 	}
 }/*}}}*/
 
@@ -1176,6 +1201,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
 			chkOutput->setVisible(true);
+			chkInput->setChecked(false);
 			
 			//m_height = 160;
 			m_height = 260;

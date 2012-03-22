@@ -48,6 +48,8 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;
+	QStringList m_currentInput;
+	QStringList m_currentOutput;
 
 	VirtualTrack *m_vtrack;
 
