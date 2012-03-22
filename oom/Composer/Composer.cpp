@@ -438,6 +438,8 @@ void Composer::currentTabChanged(int tab)
 			{
 				//printf("PatchSequencer Tab clicked\n");
 				midiConductor->update();
+				if(selected && selected->isMidiTrack())
+					midiConductor->setTrack(selected);
 			}
 			if(m_clipList)
 			{

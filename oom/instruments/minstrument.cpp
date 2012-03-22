@@ -307,9 +307,6 @@ void MidiInstrument::init()
 	_midiReset = new EventList();
 	_midiState = new EventList();
 	_controller = new MidiControllerList;
-	m_oomInstrument = false;
-	m_panValue = 0.0;
-	m_verbValue = config.minSlider;
 
 	// add some default controller to controller list
 	// this controllers are always available for all instruments
@@ -321,6 +318,9 @@ void MidiInstrument::init()
 
 MidiInstrument::MidiInstrument()
 {
+	m_oomInstrument = false;
+	m_panValue = 0.0;
+	m_verbValue = config.minSlider;
 	init();
 }
 

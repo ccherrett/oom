@@ -69,7 +69,7 @@ AudioClipList::AudioClipList(QWidget *parent)
 {
 	setupUi(this);
 	
-	m_filters << "wav" << "ogg" << "mpt";
+	m_filters << "wav" << "ogg" << "mpt" << "mid" << "kar";
 	m_watcher = new QFileSystemWatcher(this);
 	m_active = true;
 
@@ -306,13 +306,24 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)/*{{{*/
 			}
 			else
 			{
-				QAction* add = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Add to Selected Track"));
-				add->setData(2);
-				QAction* asnew = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Add to New Track"));
-				asnew->setData(3);
+				if(f.suffix().endsWith("mid", Qt::CaseInsensitive) ||
+				f.suffix().endsWith("kar", Qt::CaseInsensitive))
+				{
+					QAction* add = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Import and Append"));
+					add->setData(4);
+					QAction* rep = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Import and Replace"));
+					rep->setData(5);
+				}
+				else
+				{
+					QAction* add = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Add to Selected Track"));
+					add->setData(2);
+					QAction* asnew = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Add to New Track"));
+					asnew->setData(3);
+				}
 			}
 			QAction* ref = m->addAction(QIcon(":/images/icons/clip-folder-refresh.png"), tr("Refresh"));
-			ref->setData(4);
+			ref->setData(6);
 			QAction* act = m->exec(QCursor::pos());
 			if(act)
 			{
@@ -380,6 +391,17 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)/*{{{*/
 					}
 					break;
 					case 4:
+					{
+						oom->importMidi(f.filePath(), true);
+						song->update();
+					}
+					break;
+					case 5:
+					{//Replace
+						oom->loadProjectFile(f.filePath(), false, false);
+					}
+					break;
+					case 6:
 						setDir(m_currentPath);
 					break;
 					default:
@@ -560,7 +582,7 @@ void AudioClipList::playClicked(bool state)/*{{{*/
 			if(item)
 			{
 				QFileInfo info(item->data().toString());
-				if(!info.isDir() && !info.suffix().endsWith("mpt"))
+				if(!info.isDir() && (info.suffix().endsWith("wav") || info.suffix().endsWith("ogg")))
 				{
 					m_playlist.append(info.filePath());
 					if(m_currentSong != info.filePath())
@@ -577,7 +599,8 @@ void AudioClipList::playClicked(bool state)/*{{{*/
 				}
 				else if(!m_currentSong.isEmpty())
 				{
-					m_playlist.append(info.filePath());
+					//m_playlist.append(info.filePath());
+					m_playlist.append(m_currentSong);
 					if(player.isPlaying())
 						player.stop();
 					else

@@ -215,6 +215,8 @@ void CreateTrackDialog::addTrack()/*{{{*/
                         break;
                     }
                 }
+				m_vtrack->instrumentPan = 0.0;
+				m_vtrack->instrumentVerb = config.minSlider;
             }/*}}}*/
 
 			m_vtrack->autoCreateInstrument = chkAutoCreate->isChecked();
@@ -328,6 +330,11 @@ void CreateTrackDialog::addTrack()/*{{{*/
 						m_vtrack->useBuss = true;
 						m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
 					}
+				}
+				else
+				{
+					m_vtrack->instrumentPan = 0.0;
+					m_vtrack->instrumentVerb = config.minSlider;
 				}
 			}
 		}
