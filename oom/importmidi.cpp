@@ -531,6 +531,15 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 					MidiTrack* track = new MidiTrack();
 					track->setDefaultName();
 					track->setMasterFlag(true);
+					
+					if(config.partColorNames[lastTrackPartColorIndex].contains("menu:", Qt::CaseSensitive))
+						lastTrackPartColorIndex ++;
+					
+					track->setDefaultPartColor(lastTrackPartColorIndex);
+					lastTrackPartColorIndex ++;
+					
+					if(lastTrackPartColorIndex == NUM_PARTCOLORS)
+						lastTrackPartColorIndex = 1;
 
 					//Set track channel so buildMidiEventList can match the event to a channel
 					track->setOutChannel(chan);
@@ -578,6 +587,16 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 			track->setMasterFlag(true);
 			track->setOutChannel(0);
 			track->setOutPort(mPort);
+
+			if(config.partColorNames[lastTrackPartColorIndex].contains("menu:", Qt::CaseSensitive))
+				lastTrackPartColorIndex ++;
+			
+			track->setDefaultPartColor(lastTrackPartColorIndex);
+			lastTrackPartColorIndex ++;
+			
+			if(lastTrackPartColorIndex == NUM_PARTCOLORS)
+				lastTrackPartColorIndex = 1;
+			
 			EventList* mel = track->events();
 			// Do SysexMeta. Don't do loops.
 			// TODO: Properly support sysex dumps

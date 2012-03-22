@@ -143,15 +143,8 @@ AudioClipList::AudioClipList(QWidget *parent)
 
 	connect(m_watcher, SIGNAL(directoryChanged(const QString)), this, SLOT(refresh()));
 
-	QList<int> sizes;
-	QString str = tconfig().get_property("AudioClipList", "sizes", "30 250").toString();
-	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
-	foreach (QString s, sl)
-	{
-		int val = s.toInt();
-		sizes.append(val);
-	}
-	splitter->setSizes(sizes);
+	QByteArray state = tconfig().get_property("AudioClipList", "splitterState", "").toByteArray();
+	splitter->restoreState(state);
 	double volume = tconfig().get_property("AudioClipList", "volume", fast_log10(0.60*20.0)).toDouble();
 	//m_slider->setValue(fast_log10(0.60*20.0));
 	m_slider->setValue(volume);
@@ -170,7 +163,7 @@ AudioClipList::~AudioClipList()
 	{
 		out << QString::number(s);
 	}
-	tconfig().set_property("AudioClipList", "sizes", out.join(" "));
+	tconfig().set_property("AudioClipList", "splitterState", splitter->saveState());
 	tconfig().set_property("AudioClipList", "volume", m_slider->value());
 	saveBookmarks();
 	tconfig().save();
@@ -442,13 +435,23 @@ void AudioClipList::fileItemSelected(const QModelIndex& index)
 	if(index.isValid())
 	{
 		QStandardItem *item = m_listModel->itemFromIndex(index);
-		if(item && QFileInfo(item->data().toString()).isDir())
+		if(item)
 		{
-			setDir(item->data().toString());
-		}
-		else
-		{
-			playClicked(true);
+			QFileInfo f(item->data().toString());
+			if(f.isDir())
+			{
+				setDir(item->data().toString());
+			}
+			else
+			{
+				if(f.suffix().endsWith("mid", Qt::CaseInsensitive) ||
+				f.suffix().endsWith("kar", Qt::CaseInsensitive))
+				{
+					oom->importMidi(f.filePath());
+				}
+				else
+					playClicked(true);
+			}
 		}
 	}
 }
