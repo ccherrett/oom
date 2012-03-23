@@ -24,9 +24,9 @@ class QButton;
 class TransparentToolButton;
 class AudioTrack;
 class DoubleLabel;
-class EffectRack;
+//class EffectRack;
 
-class AuxCheckBox : public QCheckBox
+/*class AuxCheckBox : public QCheckBox
 {
 	Q_OBJECT
 	
@@ -56,7 +56,7 @@ private slots:
 
 signals:
 	void toggled(qint64, bool);
-};
+};*/
 
 //---------------------------------------------------------
 //   AudioStrip
@@ -69,15 +69,17 @@ class AudioStrip : public Strip
     int channel;
     Slider* slider;
     DoubleLabel* sl;
-    EffectRack* rack;
+    //EffectRack* rack;
+
+	AudioTrack* m_track;
 
     Knob* pan;
     DoubleLabel* panl;
 	
-	QHash<int, qint64> auxIndexList;
-	QHash<qint64, Knob*> auxKnobList;
-	QHash<qint64, DoubleLabel*> auxLabelList;
-	QHash<qint64, QLabel*> auxNameLabelList;
+	//QHash<int, qint64> auxIndexList;
+	//QHash<qint64, Knob*> auxKnobList;
+	//QHash<qint64, DoubleLabel*> auxLabelList;
+	//QHash<qint64, QLabel*> auxNameLabelList;
 
     double volume;
     double panVal;
@@ -85,13 +87,13 @@ class AudioStrip : public Strip
     QString slDefaultStyle;
 
     Knob* addKnob(QString, DoubleLabel**);
-    Knob* addAuxKnob(qint64, QString, DoubleLabel**, QLabel**);
+    //Knob* addAuxKnob(qint64, QString, DoubleLabel**, QLabel**);
 
     void updateOffState();
     void updateVolume();
     void updatePan();
     void updateChannels();
-	void updateAuxNames();
+	//void updateAuxNames();
 protected:
 	void trackChanged();
 
@@ -102,8 +104,8 @@ private slots:
     void iRoutePressed();
     void oRoutePressed();
     void routingPopupMenuActivated(QAction*);
-    void auxChanged(double, int);
-    void auxPreToggled(qint64, bool);
+    //void auxChanged(double, int);
+    //void auxPreToggled(qint64, bool);
     void volumeChanged(double);
     void volumePressed();
     void volumeReleased();
@@ -112,7 +114,7 @@ private slots:
     void panReleased();
     void volLabelChanged(double);
     void panLabelChanged(double);
-    void auxLabelChanged(double, int);
+    //void auxLabelChanged(double, int);
     void volumeRightClicked(const QPoint &);
     void panRightClicked(const QPoint &);
     void playbackClipped();
@@ -126,7 +128,7 @@ public slots:
     virtual void songChanged(int);
 
 public:
-    AudioStrip(QWidget* parent, AudioTrack*);
+    AudioStrip(QWidget* parent, Track*);
     virtual ~AudioStrip();
 
     void toggleShowEffectsRack(bool);

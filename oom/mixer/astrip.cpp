@@ -39,7 +39,7 @@
 #include "meter.h"
 #include "astrip.h"
 #include "track.h"
-#include "rack.h"
+#include "EffectRack.h"
 #include "node.h"
 #include "AudioMixer.h"
 #include "icons.h"
@@ -58,21 +58,29 @@
 //    create mixer strip
 //---------------------------------------------------------
 
-AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
+AudioStrip::AudioStrip(QWidget* parent, Track* at)
 : Strip(parent, at)
 {
-
 	volume = -1.0;
-	panVal = 0;
+	panVal = 0.0;
 
-	AudioTrack* t = (AudioTrack*) track;
-	channel = at->channels();
-	///setMinimumWidth(STRIP_WIDTH);
+	if(at->isMidiTrack())
+	{
+		m_track = (AudioTrack*)at->inputTrack();
+		if(!m_track)
+		{//MAJOR ERROR condition
+		}
+	}
+	else
+	{
+		m_track = (AudioTrack*)track;
+	}
+	AudioTrack* t = (AudioTrack*) m_track;
+	channel = t->channels();
 
 	int ch = 0;
 	for (; ch < channel; ++ch)
 		meter[ch] = new Meter(this, track->type());
-		//meter[ch] = new Meter(this);
 	for (; ch < MAX_CHANNELS; ++ch)
 		meter[ch] = 0;
 
@@ -80,9 +88,9 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	//    plugin rack
 	//---------------------------------------------------
 
-	rack = new EffectRack(this, t);
-	rack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-	rackBox->addWidget(rack);
+	//rack = new EffectRack(this, t);
+	//rack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+	//rackBox->addWidget(rack);
 
 	//---------------------------------------------------
 	//    mono/stereo  pre/post
@@ -90,13 +98,10 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 
 	m_btnStereo->setCheckable(true);
 	m_btnStereo->setObjectName("btnStereo");
-	m_btnStereo->setToolTip(tr("1/2 channel"));
+	m_btnStereo->setToolTip(tr("Stereo/Mono"));
 	m_btnStereo->setChecked(channel == 2);
 	connect(m_btnStereo, SIGNAL(clicked(bool)), SLOT(stereoToggled(bool)));
 
-	// disable mono/stereo for Synthesizer-Plugins
-	if (t->type() == Track::AUDIO_SOFTSYNTH)
-		m_btnStereo->setEnabled(false);
 
 	//pre = new QToolButton();/*{{{*/
 	//pre->setFont(config.fonts[1]);
@@ -116,18 +121,17 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	//pre->setAttribute(Qt::WA_Hover);/*}}}*/
 
 
-        // FIXME
-        // It seems the prefader send doens't send to anywhere or to the
-        // same output as the track is routing too.
-        // It also overloads 'some output' when toggling the mono/stereo button
-        // when Pre send is turned on during playback.
+	// FIXME
+	// It seems the prefader send doens't send to anywhere or to the
+	// same output as the track is routing too.
+	// It also overloads 'some output' when toggling the mono/stereo button
+	// when Pre send is turned on during playback.
 
 	//---------------------------------------------------
 	//    aux send
 	//---------------------------------------------------
 
-	//int auxsSize = song->auxs()->size();
-	if (t->hasAuxSend())
+	/*if (t->hasAuxSend())
 	{
 		int idx = 0;
 		QHash<qint64, AuxInfo>::const_iterator iter = t->auxSends()->constBegin();
@@ -153,7 +157,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 			}
 			++iter;
 		}
-	}
+	}*/
 
 	//---------------------------------------------------
 	//    slider, label, meter
@@ -171,25 +175,17 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
             sliderBgColor = g_trackColorListSelected.value(track->type());
         break;
         case 1:
-            //if(width() != m_width)
-            //    m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
-            //m_width = width();
-            //myPen.setBrush(m_scaledPixmap_w);
-            //myPen.setBrush(m_trackColor);
             sliderBgColor = QColor(0,0,0);
 			usePixmap = true;
         break;
         case 2:
             sliderBgColor = QColor(0,166,172);
-            //myPen.setBrush(QColor(0,166,172));//solid blue
         break;
         case 3:
             sliderBgColor = QColor(131,131,131);
-            //myPen.setBrush(QColor(131,131,131));//solid grey
         break;
         default:
             sliderBgColor = g_trackColorListSelected.value(track->type());
-            //myPen.setBrush(m_trackColor);
         break;
     }/*}}}*/
 
@@ -203,20 +199,16 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	slider->setValue(fast_log10(t->volume())*20.0);
 
 	m_vuBox->addWidget(slider);
-	//sliderGrid->addWidget(slider, 0, 0, Qt::AlignHCenter);
 
 	for (int i = 0; i < channel; ++i)
 	{
-		//meter[i]->setRange(config.minSlider, 10.0);
 		meter[i]->setRange(config.minMeter, 10.0);
 		meter[i]->setFixedWidth(15);
 		connect(meter[i], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
 		connect(meter[i], SIGNAL(meterClipped()), this, SLOT(playbackClipped()));
-		//sliderGrid->addWidget(meter[i], 0, i + 1); // , Qt::AlignHCenter);
 		m_vuBox->addWidget(meter[i]);
 		sliderGrid->setColumnStretch(i, 50);
 	}
-	//m_vuBox->addLayout(sliderGrid);
 
 	sl = new DoubleLabel(0.0, config.minSlider, 10.0, this);
 	sl->setSlider(slider);
@@ -253,7 +245,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	if (track->canRecord())
 	{
 		m_btnRecord->setCheckable(true);
-		m_btnRecord->setToolTip(tr("record"));
+		m_btnRecord->setToolTip(tr("Record Arm"));
 		m_btnRecord->setObjectName("btnRecord");
 		m_btnRecord->setChecked(t->recordFlag());
 		connect(m_btnRecord, SIGNAL(clicked(bool)), SLOT(recordToggled(bool)));
@@ -268,23 +260,10 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	Track::TrackType type = t->type();
 
 	m_btnMute->setCheckable(true);
-	m_btnMute->setToolTip(tr("mute"));
+	m_btnMute->setToolTip(tr("Mute"));
 	m_btnMute->setObjectName("btnMute");
 	m_btnMute->setChecked(t->mute());
 	connect(m_btnMute, SIGNAL(clicked(bool)), SLOT(muteToggled(bool)));
-
-	/*if ((bool)t->internalSolo())
-	{
-		m_btnSolo->setIcon(*soloIconSet2);
-		m_btnSolo->setIconSize(soloIconOn->size());
-		useSoloIconSet2 = true;
-	}
-	else
-	{
-		m_btnSolo->setIcon(*soloIconSet1);
-		m_btnSolo->setIconSize(soloblksqIconOn->size());
-		useSoloIconSet2 = false;
-	}*/
 
 	m_btnSolo->setCheckable(true);
 	m_btnSolo->setChecked(t->solo());
@@ -292,18 +271,17 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	connect(m_btnSolo, SIGNAL(clicked(bool)), SLOT(soloToggled(bool)));
 	if (type == Track::AUDIO_OUTPUT)
 	{
-		m_btnRecord->setToolTip(tr("record downmix"));
-		m_btnSolo->setToolTip(tr("solo mode"));
+		m_btnRecord->setToolTip(tr("Record Arm"));
+		m_btnSolo->setToolTip(tr("Solo Mode"));
 	}
 	else
 	{
-		//m_btnSolo->setToolTip(tr("pre fader listening"));
-		m_btnSolo->setToolTip(tr("solo mode"));
+		m_btnSolo->setToolTip(tr("Solo Mode"));
 	}
 
 	m_btnPower->setObjectName("btnExit");
 	m_btnPower->setCheckable(true);
-	m_btnPower->setToolTip(tr("off"));
+	m_btnPower->setToolTip(tr("Off (No Processing)"));
 	m_btnPower->setChecked(t->off());
 	connect(m_btnPower, SIGNAL(clicked(bool)), SLOT(offToggled(bool)));
 
@@ -315,20 +293,27 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	{
 		m_btnIRoute->setObjectName("btnIns");
 		m_btnIRoute->setCheckable(false);
-		m_btnIRoute->setToolTip(tr("input routing"));
+		m_btnIRoute->setToolTip(tr("Input Routing"));
 		connect(m_btnIRoute, SIGNAL(pressed()), SLOT(iRoutePressed()));
 	}
 	else
 	{
-		//m_btnIRoute->setEnabled(false);
 		m_btnIRoute->setIcon(QIcon(*mixer_blank_OffIcon));
 		m_btnIRoute->setToolTip("");
 	}
 
-	m_btnORoute->setObjectName("btnOuts");
-	m_btnORoute->setCheckable(false);
-	m_btnORoute->setToolTip(tr("output routing"));
-	connect(m_btnORoute, SIGNAL(pressed()), SLOT(oRoutePressed()));
+	if(hasORoute)
+	{
+		m_btnORoute->setObjectName("btnOuts");
+		m_btnORoute->setCheckable(false);
+		m_btnORoute->setToolTip(tr("Output Routing"));
+		connect(m_btnORoute, SIGNAL(pressed()), SLOT(oRoutePressed()));
+	}
+	else
+	{
+		m_btnIRoute->setToolTip("");
+		m_btnORoute->setIcon(QIcon(*mixer_blank_OffIcon));
+	}
 
 	//---------------------------------------------------
 	//    automation type
@@ -351,7 +336,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	autoType->insertItem(tr("Write"), AUTO_WRITE);
 	autoType->setCurrentItem(t->automationType());
 
-	if (t->automationType() == AUTO_TOUCH || t->automationType() == AUTO_WRITE)
+	if (m_track->automationType() == AUTO_TOUCH || m_track->automationType() == AUTO_WRITE)
 	{
 		QPalette palette;
 		palette.setColor(autoType->backgroundRole(), QColor(Qt::red));
@@ -363,7 +348,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 		palette.setColor(autoType->backgroundRole(), qApp->palette().color(QPalette::Active, QPalette::Background));
 		autoType->setPalette(palette);
 	}
-	autoType->setToolTip(tr("automation type"));
+	autoType->setToolTip(tr("Automation Mode"));
 	connect(autoType, SIGNAL(activated(int, int)), SLOT(setAutomationType(int, int)));
 	m_autoBox->addWidget(autoType);
 
@@ -371,7 +356,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	updateOffState(); // init state
 	m_btnPower->blockSignals(false);
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
-}/*}}}*/
+}
 
 //---------------------------------------------------------
 //   AudioStrip
@@ -391,14 +376,11 @@ void AudioStrip::heartBeat()
 {
 	if(song->invalid)
 		return;
-	for (int ch = 0; ch < track->channels(); ++ch)
+	for (int ch = 0; ch < m_track->channels(); ++ch)
 	{
 		if (meter[ch])
 		{
-			//int meterVal = track->meter(ch);
-			//int peak  = track->peak(ch);
-			//meter[ch]->setVal(meterVal, peak, false);
-			meter[ch]->setVal(track->meter(ch), track->peak(ch), false);
+			meter[ch]->setVal(m_track->meter(ch), m_track->peak(ch), false);
 		}
 	}
 	Strip::heartBeat();
@@ -465,7 +447,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 	if (val == SC_MIDI_CONTROLLER)
 		return;
 
-	AudioTrack* src = (AudioTrack*) track;
+	AudioTrack* src = (AudioTrack*) m_track;
 
 	// Do channels before config...
 	if (val & SC_CHANNELS)
@@ -488,7 +470,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 		sl->setRange(config.minSlider, 10.0);
 
 		// Adjust minimum aux knob and label values.
-		
+#if 0		
 		QHashIterator<int, qint64> iter(auxIndexList);
 		while(iter.hasNext())
 		{
@@ -503,7 +485,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 				auxLabelList[iter.value()]->blockSignals(false);
 			}
 		}
-
+#endif
 		// Adjust minimum meter values.
 		for (int c = 0; c < channel; ++c)
 			meter[c]->setRange(config.minMeter, 10.0);
@@ -518,22 +500,6 @@ void AudioStrip::songChanged(int val)/*{{{*/
 	}
 	if (m_btnSolo && (val & SC_SOLO))
 	{
-		/*if ((bool)track->internalSolo())
-		{
-			if (!useSoloIconSet2)
-			{
-				m_btnSolo->setIcon(*soloIconSet2);
-				m_btnSolo->setIconSize(soloIconOn->size());
-				useSoloIconSet2 = true;
-			}
-		}
-		else if (useSoloIconSet2)
-		{
-			m_btnSolo->setIcon(*soloIconSet1);
-			m_btnSolo->setIconSize(soloblksqIconOn->size());
-			useSoloIconSet2 = false;
-		}*/
-
 		m_btnSolo->blockSignals(true);
 		m_btnSolo->setChecked(track->solo());
 		m_btnSolo->blockSignals(false);
@@ -545,7 +511,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 		setLabelText();
 		setLabelFont();
 		//Update aux labels in case aux track was renamed
-		updateAuxNames();
+		//updateAuxNames();
 	}
 	if (val & SC_ROUTE)
 	{
@@ -556,6 +522,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 			pre->blockSignals(false);
 		}*/
 	}
+#if 0
 	if (val & SC_AUX)
 	{
 		QHashIterator<int, qint64> iter(auxIndexList);
@@ -574,6 +541,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 			}
 		}
 	}
+#endif
 	if (autoType && (val & SC_AUTOMATION))
 	{
 		autoType->blockSignals(true);
@@ -601,7 +569,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 
 void AudioStrip::updateVolume()/*{{{*/
 {
-	double vol = ((AudioTrack*) track)->volume();
+	double vol = ((AudioTrack*) m_track)->volume();
 	if (vol != volume)
 	{
 		//printf("AudioStrip::updateVolume setting slider and label\n");
@@ -614,10 +582,10 @@ void AudioStrip::updateVolume()/*{{{*/
 		sl->blockSignals(false);
 		slider->blockSignals(false);
 		volume = vol;
-		if(((AudioTrack*) track)->volFromAutomation())
+		if(((AudioTrack*) m_track)->volFromAutomation())
 		{
 			//printf("AudioStrip::updateVolume via automation\n");
-			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_VOLUME, vol);
+			midiMonitor->msgSendAudioOutputEvent((Track*)m_track, CTRL_VOLUME, vol);
 		}
 	}
 }/*}}}*/
@@ -628,7 +596,7 @@ void AudioStrip::updateVolume()/*{{{*/
 
 void AudioStrip::updatePan()/*{{{*/
 {
-	double v = ((AudioTrack*) track)->pan();
+	double v = ((AudioTrack*) m_track)->pan();
 	if (v != panVal)
 	{
 		//printf("AudioStrip::updatePan setting slider and label\n");
@@ -640,9 +608,9 @@ void AudioStrip::updatePan()/*{{{*/
 		panl->blockSignals(false);
 		pan->blockSignals(false);
 		panVal = v;
-		if(((AudioTrack*) track)->panFromAutomation())
+		if(((AudioTrack*) m_track)->panFromAutomation())
 		{
-			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_PANPOT, v);
+			midiMonitor->msgSendAudioOutputEvent((Track*)m_track, CTRL_PANPOT, v);
 		}
 	}
 }/*}}}*/
@@ -654,6 +622,7 @@ void AudioStrip::updatePan()/*{{{*/
 void AudioStrip::offToggled(bool val)
 {
 	track->setOff(val);
+	m_track->setOff(val);
 	song->update(SC_MUTE);
 }
 
@@ -672,7 +641,7 @@ void AudioStrip::updateOffState()/*{{{*/
 		m_btnStereo->setEnabled(val);
 	label->setEnabled(val);
 
-	QHashIterator<int, qint64> iter(auxIndexList);
+	/*QHashIterator<int, qint64> iter(auxIndexList);
 	while(iter.hasNext())
 	{
 		iter.next();
@@ -681,7 +650,7 @@ void AudioStrip::updateOffState()/*{{{*/
 			auxKnobList[iter.value()]->setEnabled(val);
 			auxLabelList[iter.value()]->setEnabled(val);
 		}
-	}
+	}*/
 
 	//if (pre)
 	//	pre->setEnabled(val);
@@ -708,7 +677,7 @@ void AudioStrip::updateOffState()/*{{{*/
 
 void AudioStrip::preToggled(bool val)
 {
-	audio->msgSetPrefader((AudioTrack*) track, val);
+	audio->msgSetPrefader((AudioTrack*) m_track, val);
 	resetPeaks();
 	song->update(SC_ROUTE);
 }
@@ -719,12 +688,12 @@ void AudioStrip::preToggled(bool val)
 
 void AudioStrip::stereoToggled(bool val)
 {
-	int oc = track->channels();
+	int oc = m_track->channels();
 	int nc = val ? 2 : 1;
 	//      m_btnStereo->setIcon(nc == 2 ? *stereoIcon : *monoIcon);
 	if (oc == nc)
 		return;
-	audio->msgSetChannels((AudioTrack*) track, nc);
+	audio->msgSetChannels((AudioTrack*) m_track, nc);
 	song->update(SC_CHANNELS);
 }
 
@@ -732,6 +701,7 @@ void AudioStrip::stereoToggled(bool val)
 //   auxChanged
 //---------------------------------------------------------
 
+#if 0
 void AudioStrip::auxChanged(double val, int idx)
 {
 	double vol;
@@ -757,7 +727,6 @@ void AudioStrip::auxPreToggled(qint64 idx, bool state)
 //---------------------------------------------------------
 //   auxLabelChanged
 //---------------------------------------------------------
-
 void AudioStrip::auxLabelChanged(double val, int idx)
 {
 	if (auxIndexList.isEmpty() || !auxIndexList.contains(idx))
@@ -765,6 +734,7 @@ void AudioStrip::auxLabelChanged(double val, int idx)
 	if(!auxKnobList.isEmpty() && auxKnobList.contains(auxIndexList[idx]))
 		auxKnobList[auxIndexList[idx]]->setValue(val);
 }
+#endif
 
 //---------------------------------------------------------
 //   volumeChanged
@@ -772,9 +742,9 @@ void AudioStrip::auxLabelChanged(double val, int idx)
 
 void AudioStrip::volumeChanged(double val)
 {
-	AutomationType at = ((AudioTrack*) track)->automationType();
+	AutomationType at = ((AudioTrack*) m_track)->automationType();
 	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enableVolumeController(false);
+		m_track->enableVolumeController(false);
 
 	//printf("AudioStrip::volumeChanged(%g) \n", val);
 	double vol;
@@ -786,8 +756,8 @@ void AudioStrip::volumeChanged(double val)
 	else
 		vol = pow(10.0, val / 20.0);
 	volume = vol;
-	audio->msgSetVolume((AudioTrack*) track, vol);
-	((AudioTrack*) track)->recordAutomation(AC_VOLUME, vol);
+	audio->msgSetVolume((AudioTrack*) m_track, vol);
+	((AudioTrack*) m_track)->recordAutomation(AC_VOLUME, vol);
 	song->update(SC_TRACK_MODIFIED);
 	//double vv = (vol + 60)/0.5546875;
 	//printf("AudioStrip::volumeChanged(%g) - val: %g - midiNum: %d whacky: %d\n", vol, dbToTrackVol(val), dbToMidi(val), dbToMidi(trackVolToDb(vol)));
@@ -799,9 +769,9 @@ void AudioStrip::volumeChanged(double val)
 
 void AudioStrip::volumePressed()
 {
-	AutomationType at = ((AudioTrack*) track)->automationType();
+	AutomationType at = ((AudioTrack*) m_track)->automationType();
 	if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-		track->enableVolumeController(false);
+		m_track->enableVolumeController(false);
 
 	double val = slider->value();
 	double vol;
@@ -813,8 +783,8 @@ void AudioStrip::volumePressed()
 	else
 		vol = pow(10.0, val / 20.0);
 	volume = vol;
-	audio->msgSetVolume((AudioTrack*) track, volume);
-	((AudioTrack*) track)->startAutoRecord(AC_VOLUME, volume);
+	audio->msgSetVolume((AudioTrack*) m_track, volume);
+	((AudioTrack*) m_track)->startAutoRecord(AC_VOLUME, volume);
 }
 
 //---------------------------------------------------------
@@ -826,7 +796,7 @@ void AudioStrip::volumeReleased()
 	if (track->automationType() != AUTO_WRITE)
 		track->enableVolumeController(true);
 
-	((AudioTrack*) track)->stopAutoRecord(AC_VOLUME, volume);
+	((AudioTrack*) m_track)->stopAutoRecord(AC_VOLUME, volume);
 }
 
 //---------------------------------------------------------
@@ -835,7 +805,7 @@ void AudioStrip::volumeReleased()
 
 void AudioStrip::volumeRightClicked(const QPoint &p)
 {
-	song->execAutomationCtlPopup((AudioTrack*) track, p, AC_VOLUME);
+	song->execAutomationCtlPopup((AudioTrack*) m_track, p, AC_VOLUME);
 }
 
 //---------------------------------------------------------
@@ -844,9 +814,9 @@ void AudioStrip::volumeRightClicked(const QPoint &p)
 
 void AudioStrip::volLabelChanged(double val)
 {
-	AutomationType at = ((AudioTrack*) track)->automationType();
+	AutomationType at = ((AudioTrack*) m_track)->automationType();
 	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enableVolumeController(false);
+		m_track->enableVolumeController(false);
 
 	double vol;
 	if (val <= config.minSlider)
@@ -858,8 +828,8 @@ void AudioStrip::volLabelChanged(double val)
 		vol = pow(10.0, val / 20.0);
 	volume = vol;
 	slider->setValue(val);
-	audio->msgSetVolume((AudioTrack*) track, vol);
-	((AudioTrack*) track)->startAutoRecord(AC_VOLUME, vol);
+	audio->msgSetVolume((AudioTrack*) m_track, vol);
+	((AudioTrack*) m_track)->startAutoRecord(AC_VOLUME, vol);
 }
 
 //---------------------------------------------------------
@@ -868,13 +838,13 @@ void AudioStrip::volLabelChanged(double val)
 
 void AudioStrip::panChanged(double val)
 {
-	AutomationType at = ((AudioTrack*) track)->automationType();
+	AutomationType at = ((AudioTrack*) m_track)->automationType();
 	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enablePanController(false);
+		m_track->enablePanController(false);
 
 	panVal = val;
-	audio->msgSetPan(((AudioTrack*) track), val);
-	((AudioTrack*) track)->recordAutomation(AC_PAN, val);
+	audio->msgSetPan(((AudioTrack*) m_track), val);
+	((AudioTrack*) m_track)->recordAutomation(AC_PAN, val);
 	//printf("AudioStrip::panChanged(%d) midiToTrackPan(%g)\n", trackPanToMidi(val), midiToTrackPan(trackPanToMidi(val)));
 }
 
@@ -884,13 +854,13 @@ void AudioStrip::panChanged(double val)
 
 void AudioStrip::panPressed()
 {
-	AutomationType at = ((AudioTrack*) track)->automationType();
+	AutomationType at = ((AudioTrack*) m_track)->automationType();
 	if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-		track->enablePanController(false);
+		m_track->enablePanController(false);
 
 	panVal = pan->value();
-	audio->msgSetPan(((AudioTrack*) track), panVal);
-	((AudioTrack*) track)->startAutoRecord(AC_PAN, panVal);
+	audio->msgSetPan(((AudioTrack*) m_track), panVal);
+	((AudioTrack*) m_track)->startAutoRecord(AC_PAN, panVal);
 }
 
 //---------------------------------------------------------
@@ -899,9 +869,9 @@ void AudioStrip::panPressed()
 
 void AudioStrip::panReleased()
 {
-	if (track->automationType() != AUTO_WRITE)
-		track->enablePanController(true);
-	((AudioTrack*) track)->stopAutoRecord(AC_PAN, panVal);
+	if (m_track->automationType() != AUTO_WRITE)
+		m_track->enablePanController(true);
+	((AudioTrack*) m_track)->stopAutoRecord(AC_PAN, panVal);
 }
 
 //---------------------------------------------------------
@@ -910,7 +880,7 @@ void AudioStrip::panReleased()
 
 void AudioStrip::panRightClicked(const QPoint &p)
 {
-	song->execAutomationCtlPopup((AudioTrack*) track, p, AC_PAN);
+	song->execAutomationCtlPopup((AudioTrack*) m_track, p, AC_PAN);
 }
 
 //---------------------------------------------------------
@@ -919,14 +889,14 @@ void AudioStrip::panRightClicked(const QPoint &p)
 
 void AudioStrip::panLabelChanged(double val)
 {
-	AutomationType at = ((AudioTrack*) track)->automationType();
+	AutomationType at = ((AudioTrack*) m_track)->automationType();
 	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enablePanController(false);
+		m_track->enablePanController(false);
 
 	panVal = val;
 	pan->setValue(val);
-	audio->msgSetPan((AudioTrack*) track, val);
-	((AudioTrack*) track)->startAutoRecord(AC_PAN, val);
+	audio->msgSetPan((AudioTrack*) m_track, val);
+	((AudioTrack*) m_track)->startAutoRecord(AC_PAN, val);
 }
 
 //---------------------------------------------------------
@@ -935,7 +905,8 @@ void AudioStrip::panLabelChanged(double val)
 
 void AudioStrip::updateChannels()/*{{{*/
 {
-	AudioTrack* t = (AudioTrack*) track;
+	//FIXME: Set the channels on the wave tracks input as well
+	AudioTrack* t = (AudioTrack*) m_track;
 	int c = t->channels();
 	//printf("AudioStrip::updateChannels track channels:%d current channels:%d\n", c, channel);
 
@@ -943,16 +914,11 @@ void AudioStrip::updateChannels()/*{{{*/
 	{
 		for (int cc = channel; cc < c; ++cc)
 		{
-			//meter[cc] = new Meter(this);
-			//meter[cc] = new Meter(this, track->type(), Meter::LinMeter, Qt::Vertical);
 			meter[cc] = new Meter(this, track->type());
-			//meter[cc]->setRange(config.minSlider, 10.0);
 			meter[cc]->setRange(config.minMeter, 10.0);
 			meter[cc]->setFixedWidth(15);
 			connect(meter[cc], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
 			m_vuBox->addWidget(meter[cc]);
-			//sliderGrid->addWidget(meter[cc], 0, cc + 1, Qt::AlignHCenter);
-			//sliderGrid->setColumnStretch(cc, 50);
 			meter[cc]->show();
 		}
 	}
@@ -1057,7 +1023,7 @@ Knob* AudioStrip::addKnob(QString name, DoubleLabel** dlabel)/*{{{*/
 	connect(knob, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(panRightClicked(const QPoint &)));
 	return knob;
 }/*}}}*/
-
+#if 0
 Knob* AudioStrip::addAuxKnob(qint64 id, QString name, DoubleLabel** dlabel, QLabel** nameLabel)/*{{{*/
 {
 	Knob* knob = new Knob(this);
@@ -1131,7 +1097,7 @@ Knob* AudioStrip::addAuxKnob(qint64 id, QString name, DoubleLabel** dlabel, QLab
 	return knob;
 }/*}}}*/
 
-void AudioStrip::updateAuxNames()
+void AudioStrip::updateAuxNames()/*{{{*/
 {
 	QHashIterator<qint64, QLabel*> iter(auxNameLabelList);
 	while(iter.hasNext())
@@ -1149,11 +1115,11 @@ void AudioStrip::updateAuxNames()
 			}
 		}
 	}
-}
-
+}/*}}}*/
+#endif
 void AudioStrip::trackChanged()
 {
-	rack->setTrack((AudioTrack*)track);
+	//rack->setTrack((AudioTrack*)track);
 	songChanged(-1);
 }
 
@@ -1163,15 +1129,28 @@ void AudioStrip::trackChanged()
 
 void AudioStrip::iRoutePressed()
 {
-	//if(track->isMidiTrack() || (track->type() == Track::AUDIO_AUX) || (track->type() == Track::AUDIO_SOFTSYNTH))
-	if (!track || track->isMidiTrack() || track->type() == Track::AUDIO_AUX)
+	if (!track || track->type() == Track::AUDIO_AUX)
 	{
 		gRoutingPopupMenuMaster = 0;
 		return;
 	}
-	AudioPortConfig* aconf = oom->getRoutingDialog(true);
-	if(aconf)
-		aconf->setSelected((AudioTrack*)track);
+	if(track->isMidiTrack())
+	{
+		PopupMenu* pup = oom->prepareRoutingPopupMenu(track, false);
+		if (!pup)
+			return;
+
+		gRoutingPopupMenuMaster = this;
+		connect(pup, SIGNAL(triggered(QAction*)), SLOT(routingPopupMenuActivated(QAction*)));
+		connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
+		pup->popup(QCursor::pos());
+	}
+	else
+	{
+		AudioPortConfig* aconf = oom->getRoutingDialog(true);
+		if(aconf)
+			aconf->setSelected(m_track);
+	}
 }
 
 //---------------------------------------------------------
@@ -1180,140 +1159,10 @@ void AudioStrip::iRoutePressed()
 
 void AudioStrip::routingPopupMenuActivated(QAction* act)
 {
-	if (!track || gRoutingPopupMenuMaster != this || track->isMidiTrack())
+	if (gRoutingPopupMenuMaster != this || !track || !track->isMidiTrack())
 		return;
 
-	PopupMenu* pup = oom->getRoutingPopupMenu();
-
-	if (pup->actions().isEmpty())
-		return;
-
-	AudioTrack* t = (AudioTrack*) track;
-	RouteList* rl = gIsOutRoutingPopupMenu ? t->outRoutes() : t->inRoutes();
-
-	int n = act->data().toInt();
-	if (n == -1)
-		return;
-
-	if (gIsOutRoutingPopupMenu)
-	{
-		if (track->type() == Track::AUDIO_OUTPUT)
-		{
-
-			int chan = n & 0xf;
-
-			Route srcRoute(t, chan);
-			Route dstRoute(act->text(), true, -1, Route::JACK_ROUTE);
-			dstRoute.channel = chan;
-
-			// check if route src->dst exists:
-			iRoute irl = rl->begin();
-			for (; irl != rl->end(); ++irl)
-			{
-				if (*irl == dstRoute)
-					break;
-			}
-			if (irl != rl->end())
-			{
-				// disconnect if route exists
-				audio->msgRemoveRoute(srcRoute, dstRoute);
-			}
-			else
-			{
-				// connect if route does not exist
-				audio->msgAddRoute(srcRoute, dstRoute);
-			}
-			audio->msgUpdateSoloStates();
-			song->update(SC_ROUTE);
-			return;
-		}
-
-		iRouteMenuMap imm = gRoutingMenuMap.find(n);
-		if (imm == gRoutingMenuMap.end())
-			return;
-
-		Route srcRoute(t, imm->second.channel, imm->second.channels);
-		srcRoute.remoteChannel = imm->second.remoteChannel;
-
-		Route &dstRoute = imm->second;
-
-		// check if route src->dst exists:
-		iRoute irl = rl->begin();
-		for (; irl != rl->end(); ++irl)
-		{
-			if (*irl == dstRoute)
-				break;
-		}
-		if (irl != rl->end())
-		{
-			// disconnect if route exists
-			audio->msgRemoveRoute(srcRoute, dstRoute);
-		}
-		else
-		{
-			// connect if route does not exist
-			audio->msgAddRoute(srcRoute, dstRoute);
-		}
-		audio->msgUpdateSoloStates();
-		song->update(SC_ROUTE);
-	}
-	else
-	{
-		if (track->type() == Track::AUDIO_INPUT)
-		{
-			int chan = n & 0xf;
-
-			Route srcRoute(act->text(), false, -1, Route::JACK_ROUTE);
-			Route dstRoute(t, chan);
-
-			srcRoute.channel = chan;
-
-			iRoute irl = rl->begin();
-			for (; irl != rl->end(); ++irl)
-			{
-				if (*irl == srcRoute)
-					break;
-			}
-			if (irl != rl->end())
-				// disconnect
-				audio->msgRemoveRoute(srcRoute, dstRoute);
-			else
-				// connect
-				audio->msgAddRoute(srcRoute, dstRoute);
-
-			audio->msgUpdateSoloStates();
-			song->update(SC_ROUTE);
-			return;
-		}
-
-		iRouteMenuMap imm = gRoutingMenuMap.find(n);
-		if (imm == gRoutingMenuMap.end())
-			return;
-
-		Route &srcRoute = imm->second;
-
-		Route dstRoute(t, imm->second.channel, imm->second.channels);
-		dstRoute.remoteChannel = imm->second.remoteChannel;
-
-		iRoute irl = rl->begin();
-		for (; irl != rl->end(); ++irl)
-		{
-			if (*irl == srcRoute)
-				break;
-		}
-		if (irl != rl->end())
-		{
-			// disconnect
-			audio->msgRemoveRoute(srcRoute, dstRoute);
-		}
-		else
-		{
-			// connect
-			audio->msgAddRoute(srcRoute, dstRoute);
-		}
-		audio->msgUpdateSoloStates();
-		song->update(SC_ROUTE);
-	}
+	oom->routingPopupMenuActivated(track, act->data().toInt());
 }
 
 //---------------------------------------------------------
@@ -1344,20 +1193,14 @@ void AudioStrip::playbackClipped()
 void AudioStrip::resetPeaks()
 {
 	track->resetPeaks();
+	if(track->isMidiTrack() && m_track)
+		m_track->resetPeaks();
 	sl->setStyleSheet(slDefaultStyle);
 }
 
 void AudioStrip::toggleShowEffectsRack(bool open)
 {
 	toggleAuxPanel(open);
-	/*if (rack->isVisible())
-	{
-		rack->hide();
-	}
-	else
-	{
-		rack->show();
-	}*/
 }
 
 //---------------------------------------------------------

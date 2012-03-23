@@ -62,6 +62,7 @@ QT4_WRAP_CPP (widget_mocs
 	  tviewdock.h
 	  tracklistview.h
 	  trackheader.h
+	  EffectRack.h
 	  rmap.h
 	  rmapdialog.h
 	  conductor/pctablemodel.h
@@ -212,6 +213,7 @@ file (GLOB widgets_source_files
 	  tviewdock.cpp
 	  tracklistview.cpp
 	  trackheader.cpp
+	  EffectRack.cpp
 	  rmap.cpp
 	  rmapdialog.cpp
       mtscale.cpp 

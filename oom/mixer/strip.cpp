@@ -32,6 +32,7 @@
 #include "meter.h"
 #include "utils.h"
 #include "ttoolbutton.h"
+#include "TrackEffects.h"
 
 //---------------------------------------------------------
 //   Strip
@@ -85,9 +86,6 @@ Strip::Strip(QWidget* parent, Track* t)
 	{
 		case Track::AUDIO_OUTPUT:
 			label->setObjectName("MixerAudioOutLabel");
-			m_auxBase->setObjectName("MixerAudioOutAuxbox");
-			//m_btnAux->toggle(); //Collapse the box by default
-			//m_btnAux->setEnabled(false);
 			hasRecord = true;
 			hasAux = false;
 			hasStereo = true;
@@ -96,7 +94,6 @@ Strip::Strip(QWidget* parent, Track* t)
 			break;
 		case Track::AUDIO_BUSS:
 			label->setObjectName("MixerAudioBussLabel");
-			m_auxBase->setObjectName("MixerAudioBussAuxbox");
 			hasRecord = false;
 			hasAux = true;
 			hasStereo = true;
@@ -105,9 +102,6 @@ Strip::Strip(QWidget* parent, Track* t)
 			break;
 		case Track::AUDIO_AUX:
 			label->setObjectName("MixerAuxLabel");
-			m_auxBase->setObjectName("MixerAuxAuxbox");
-			//m_btnAux->toggle(); //Collapse the box by default
-			//m_btnAux->setEnabled(false);
 			hasRecord = false;
 			hasAux = false;
 			hasStereo = true;
@@ -116,7 +110,6 @@ Strip::Strip(QWidget* parent, Track* t)
 			break;
 		case Track::WAVE:
 			label->setObjectName("MixerWaveLabel");
-			m_auxBase->setObjectName("MixerWaveAuxbox");
 			hasRecord = true;
 			hasAux = true;
 			hasStereo = true;
@@ -125,7 +118,6 @@ Strip::Strip(QWidget* parent, Track* t)
 			break;
 		case Track::AUDIO_INPUT:
 			label->setObjectName("MixerAudioInLabel");
-			m_auxBase->setObjectName("MixerAudioInAuxbox");
 			hasRecord = false;
 			hasAux = true;
 			hasStereo = true;
@@ -134,7 +126,6 @@ Strip::Strip(QWidget* parent, Track* t)
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 			label->setObjectName("MixerSynthLabel");
-			m_auxBase->setObjectName("MixerSynthAuxbox");
 			m_btnAux->toggle(); //Collapse the box by default
 			hasRecord = true;
 			hasAux = true;
@@ -145,14 +136,10 @@ Strip::Strip(QWidget* parent, Track* t)
 		case Track::MIDI:
 		{
 			label->setObjectName("MidiTrackLabel");
-			m_auxBase->setObjectName("MidiTrackAuxbox");
-			//topRack = QPixmap(":/images/top_rack_midi.png");
-			//bottomRack = QPixmap(":/images/bottom_rack_midi.png");
-			//m_btnStereo->setVisible(false);
-			m_btnStereo->setIcon(QIcon(*mixer_blank_OffIcon));
+			//m_btnStereo->setIcon(QIcon(*mixer_blank_OffIcon));
 			hasRecord = true;
 			hasAux = true; //Used for controller knobs in midi
-			hasStereo = false;
+			hasStereo = true;
 			hasIRoute = true;
 			hasORoute = false;
 		}
@@ -160,10 +147,6 @@ Strip::Strip(QWidget* parent, Track* t)
 		case Track::DRUM:
 		{
 			label->setObjectName("MidiDrumTrackLabel");
-			m_auxBase->setObjectName("MidiDrumTrackAuxbox");
-			//topRack = QPixmap(":/images/top_rack_midi.png");
-			//bottomRack = QPixmap(":/images/bottom_rack_midi.png");
-			//m_btnStereo->setEnabled(false);
 			m_btnStereo->setIcon(*mixer_blank_OffIcon);
 			hasRecord = true;
 			hasAux = true; //Used for controller knobs in midi
@@ -174,13 +157,13 @@ Strip::Strip(QWidget* parent, Track* t)
 			break;
 	}/*}}}*/
 
-	if(hasAux)
-		m_tabWidget->addTab(m_auxTab, QString(tr("Aux")));
-	if(!track->isMidiTrack())
-		m_tabWidget->addTab(m_fxTab, QString(tr("FX")));
+	//if(hasAux)
+	//	m_tabWidget->addTab(m_auxTab, QString(tr("Aux")));
+	//if(!track->isMidiTrack())
+	//	m_tabWidget->addTab(m_fxTab, QString(tr("FX")));
 	
-	m_tabWidget->setCurrentIndex(track->mixerTab());
-	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+	//m_tabWidget->setCurrentIndex(track->mixerTab());
+	//connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 	//printf("Strip::Strip w:%d frw:%d layoutmarg:%d lx:%d ly:%d lw:%d lh:%d\n", STRIP_WIDTH, frameWidth(), layout->margin(), label->x(), label->y(), label->width(), label->height());
 
 	label->setTextFormat(Qt::PlainText);
@@ -370,18 +353,18 @@ void Strip::layoutUi()/*{{{*/
 	
 	horizontalLayout_2->addWidget(m_buttonBase);
 	
-	m_tabWidget = new QTabWidget(m_mixerBase);
-	m_tabWidget->setObjectName(QString::fromUtf8("m_tabWidget"));
-	m_tabWidget->setTabPosition(QTabWidget::North);
-	m_tabWidget->setIconSize(QSize(0, 0));
+	//m_tabWidget = new QTabWidget(m_mixerBase);
+	//m_tabWidget->setObjectName(QString::fromUtf8("m_tabWidget"));
+	//m_tabWidget->setTabPosition(QTabWidget::North);
+	//m_tabWidget->setIconSize(QSize(0, 0));
 	
-	m_auxTab = new QWidget();
-	m_auxTab->setObjectName(QString::fromUtf8("auxTab"));
+	//m_auxTab = new QWidget();
+	//m_auxTab->setObjectName(QString::fromUtf8("auxTab"));
 	
-	m_auxTabLayout = new QVBoxLayout(m_auxTab);
-	m_auxTabLayout->setSpacing(0);
-	m_auxTabLayout->setContentsMargins(0, 0, 0, 0);
-	m_auxTabLayout->setObjectName(QString::fromUtf8("auxTabLayout"));
+	//m_auxTabLayout = new QVBoxLayout(m_auxTab);
+	//m_auxTabLayout->setSpacing(0);
+	//m_auxTabLayout->setContentsMargins(0, 0, 0, 0);
+	//m_auxTabLayout->setObjectName(QString::fromUtf8("auxTabLayout"));
 	
 	m_mixerBox->addLayout(horizontalLayout_2);
 	
@@ -406,21 +389,21 @@ void Strip::layoutUi()/*{{{*/
 	
 	horizontalLayout->addWidget(m_mixerBase);
 	
-	m_auxScroll = new QScrollArea(m_auxTab);
-	m_auxScroll->setObjectName(QString::fromUtf8("m_auxScroll"));
-	QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	sizePolicy2.setHorizontalStretch(1);
-	sizePolicy2.setVerticalStretch(0);
-	sizePolicy2.setHeightForWidth(m_auxScroll->sizePolicy().hasHeightForWidth());
-	m_auxScroll->setSizePolicy(sizePolicy2);
-	m_auxScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_auxScroll->setWidgetResizable(true);
-	m_auxScroll->setAlignment(Qt::AlignCenter);
-	m_auxScroll->setAutoFillBackground(true);
-	m_auxScroll->setMinimumSize(QSize(95,0));
+	//m_auxScroll = new QScrollArea(m_auxTab);
+	//m_auxScroll->setObjectName(QString::fromUtf8("m_auxScroll"));
+	//QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	///sizePolicy2.setHorizontalStretch(1);
+	//sizePolicy2.setVerticalStretch(0);
+	//sizePolicy2.setHeightForWidth(m_auxScroll->sizePolicy().hasHeightForWidth());
+	//m_auxScroll->setSizePolicy(sizePolicy2);
+	//m_auxScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//m_auxScroll->setWidgetResizable(true);
+	//m_auxScroll->setAlignment(Qt::AlignCenter);
+	//m_auxScroll->setAutoFillBackground(true);
+	//m_auxScroll->setMinimumSize(QSize(95,0));
 	
-	m_auxBase = new QFrame(this);
-	switch (track->type())/*{{{*/
+	//m_auxBase = new QFrame(this);
+	/*switch (track->type())//{{{
 	{
 		case Track::AUDIO_OUTPUT:
 			m_auxBase->setObjectName("MixerAudioOutAuxbox");
@@ -446,33 +429,35 @@ void Strip::layoutUi()/*{{{*/
 		case Track::DRUM:
 			m_auxBase->setObjectName("MidiDrumTrackAuxbox");
 			break;
-	}/*}}}*/
-	QSizePolicy auxSizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	auxSizePolicy2.setHorizontalStretch(1);
-	auxSizePolicy2.setVerticalStretch(0);
-	auxSizePolicy2.setHeightForWidth(m_auxBase->sizePolicy().hasHeightForWidth());
-	//m_auxBase->setObjectName("m_auxBase");
-	//m_auxBase->setGeometry(QRect(0, 0, 80, 330));
+	}//}}}*/
+	//QSizePolicy auxSizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	//auxSizePolicy2.setHorizontalStretch(1);
+	//auxSizePolicy2.setVerticalStretch(0);
+	//auxSizePolicy2.setHeightForWidth(m_auxBase->sizePolicy().hasHeightForWidth());
 	
-	m_auxBox = new QVBoxLayout(m_auxBase);
-	m_auxBox->setObjectName(QString::fromUtf8("m_auxBox"));
-	m_auxBox->setContentsMargins(0, -1, 0, -1);
-	m_auxBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
-	m_auxScroll->setWidget(m_auxBase);
+	//m_auxBox = new QVBoxLayout(m_auxBase);
+	//m_auxBox->setObjectName(QString::fromUtf8("m_auxBox"));
+	//m_auxBox->setContentsMargins(0, -1, 0, -1);
+	//m_auxBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
+	//m_auxScroll->setWidget(m_auxBase);
 	
 
-	m_auxTabLayout->addWidget(m_auxScroll);
-	m_fxTab = new QWidget();
-	m_fxTab->setObjectName(QString::fromUtf8("fxTab"));
-	rackBox = new QVBoxLayout(m_fxTab);
-	rackBox->setSpacing(0);
-	rackBox->setContentsMargins(0, 0, 0, 0);
-	rackBox->setObjectName(QString::fromUtf8("rackBox"));
+	//m_auxTabLayout->addWidget(m_auxScroll);
+	//m_fxTab = new QWidget();
+	//m_fxTab->setObjectName(QString::fromUtf8("fxTab"));
+	//rackBox = new QVBoxLayout(m_fxTab);
+	//rackBox->setSpacing(0);
+	//rackBox->setContentsMargins(0, 0, 0, 0);
+	//rackBox->setObjectName(QString::fromUtf8("rackBox"));
 	
 //	m_tabWidget->addTab(m_auxTab, QString(tr("Aux")));
 //	m_tabWidget->addTab(m_fxTab, QString(tr("FX")));
+	//horizontalLayout->addWidget(m_tabWidget);
 	
-	horizontalLayout->addWidget(m_tabWidget);
+	m_effectsRack = new TrackEffects(track, this);
+	m_effectsRack->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	connect(song, SIGNAL(songChanged(int)), m_effectsRack, SLOT(songChanged(int)));
+	horizontalLayout->addWidget(m_effectsRack);
 	
 	horizontalLayout->setStretch(0, 2);
 	
@@ -485,11 +470,11 @@ void Strip::layoutUi()/*{{{*/
 	connect(m_btnAux, SIGNAL(toggled(bool)), this, SLOT(toggleAuxPanel(bool)));
 }/*}}}*/
 
-void Strip::tabChanged(int tab)
+/*void Strip::tabChanged(int tab)
 {
 	if(track)
 		track->setMixerTab(tab);
-}
+}*/
 
 /**
  * @param t Track object.
@@ -503,8 +488,19 @@ bool Strip::setTrack(Track* t)
 	{
 		track = t;
 		m_type = t->type();
+
+		if(m_effectsRack)
+		{
+			m_effectsRack->hide();
+			delete m_effectsRack;
+		}
+		m_effectsRack = new TrackEffects(track, this);
+		m_effectsRack->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+		m_effectsRack->setVisible(!track->collapsed());
+		connect(song, SIGNAL(songChanged(int)), m_effectsRack, SLOT(songChanged(int)));
+		horizontalLayout->addWidget(m_effectsRack);
+	
 		trackChanged();
-		//songChanged(-1);
 		return true;
 	}
 	return false;
@@ -593,7 +589,8 @@ void Strip::setLabelText()
 
 void Strip::toggleAuxPanel(bool collapse)
 {
-	m_tabWidget->setVisible(!collapse);
+	m_effectsRack->setVisible(!collapse);
+	//m_tabWidget->setVisible(!collapse);
 	m_collapsed = collapse;
 	if(!collapse)
 	{
@@ -643,6 +640,11 @@ void Strip::setAutomationType(int t, int)
 {
     if (track->isMidiTrack())
     {
+		Track* input = track->inputTrack();
+		if(input)
+		{
+        	input->setAutomationType(AutomationType(t));
+		}
         if (track->wantsAutomation())
         {
             AudioTrack* atrack = ((MidiTrack*)track)->getAutomationTrack();

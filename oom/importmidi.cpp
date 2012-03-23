@@ -59,7 +59,7 @@ void OOMidi::importMidi(const QString &file)
 			tr("Add midi file to current project?\n"),
 			tr("&Add to Project"),
 			tr("&Replace"),
-			tr("&Abort"), 0, 2);
+			tr("&Cancel"), 0, 2);
 
 	switch (n)
 	{
@@ -557,6 +557,8 @@ bool OOMidi::importMidi(const QString name, bool merge)/*{{{*/
 					processTrack(track);
 
 					//Update track to channel 1
+					//99% of all midi we import will be alien to our setup anyway,
+					//so I'm making it easy for the user to just set the Instrument and go
 					track->setOutChannel(0);
 
 					song->insertTrack(track, -1);

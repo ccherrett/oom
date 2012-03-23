@@ -158,6 +158,7 @@ class ComposerCanvas : public Canvas
     void checkAutomation(Track * t, const QPoint& pointer, bool addNewCtrl);
 	bool checkAutomationForTrack(Track * t, const QPoint &pointer, bool addNewCtrl, Track *rt = 0);
     void selectAutomation(Track * t, const QPoint& pointer);
+    bool selectAutomationForTrack(Track * t, const QPoint& pointer, Track* realTrack = 0);
     void processAutomationMovements(QMouseEvent *event);    
     void addNewAutomation(QMouseEvent *event);    
 	double getControlValue(CtrlList*, double);

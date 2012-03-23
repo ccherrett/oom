@@ -36,7 +36,7 @@
 #include "meter.h"
 #include "track.h"
 #include "doublelabel.h"
-#include "rack.h"
+#include "EffectRack.h"
 #include "node.h"
 #include "AudioMixer.h"
 #include "icons.h"

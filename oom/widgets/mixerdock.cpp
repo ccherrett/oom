@@ -21,7 +21,7 @@
 #include "shortcuts.h"
 
 #include "mixer/astrip.h"
-#include "mixer/mstrip.h"
+//#include "mixer/mstrip.h"
 #include "apconfig.h"
 #include "track.h"
 
@@ -311,15 +311,15 @@ void MixerDock::addStrip(Track* t, int idx)/*{{{*/
 	}
 	else
 	{
-		Strip* strip;
-		if (t->isMidiTrack())
+		Strip* strip = new AudioStrip(central, t);
+		/*if (t->isMidiTrack())
 		{
 			strip = new MidiStrip(central, (MidiTrack*) t);
 		}
 		else
 		{
 			strip = new AudioStrip(central, (AudioTrack*) t);
-		}
+		}*/
 		switch (t->type())
 		{/*{{{*/
 			case Track::AUDIO_OUTPUT:

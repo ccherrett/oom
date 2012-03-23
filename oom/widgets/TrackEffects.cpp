@@ -21,7 +21,7 @@
 #include "knob.h"
 #include "doublelabel.h"
 #include "meter.h"
-#include "rack.h"
+#include "EffectRack.h"
 #include "node.h"
 #include "popupmenu.h"
 #include "midictrl.h"

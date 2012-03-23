@@ -18,7 +18,7 @@
 #include "shortcuts.h"
 
 #include "astrip.h"
-#include "mstrip.h"
+//#include "mstrip.h"
 #include "apconfig.h"
 
 #include "gconfig.h"

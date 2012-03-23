@@ -253,7 +253,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			{
 				m_track->setMasterFlag(true);
 				//if(vtrack->instrumentType == SYNTH_INSTRUMENT)
-				m_track->setHeight(MIN_TRACKHEIGHT);
+				//m_track->setHeight(MIN_TRACKHEIGHT);
 				if(vtrack->autoCreateInstrument)
 				{
 					if(!loadInstrument(vtrack))
@@ -1182,8 +1182,8 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 						{
 							lsClient->removeInstrumentChannel(track->samplerData());
 						}
-						track->setWantsAutomation(true);
 					}
+					track->setWantsAutomation(true);
 				}
 				if(ndev)
 				{

@@ -5112,14 +5112,30 @@ bool ComposerCanvas::checkAutomationForTrack(Track * t, const QPoint &pointer, b
 
 void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 {
-	if (t->isMidiTrack() && t->wantsAutomation() == false)
+	Track* inputTrack = 0;/*{{{*/
+	if (t->isMidiTrack())
 	{
-		return;
+		bool found = false;
+		inputTrack = t->inputTrack();
+		if(inputTrack)
+		{
+			found = selectAutomationForTrack(inputTrack, pointer, t);
+		}
+    	if (!found && t->wantsAutomation())
+    	{
+    	    AudioTrack* atrack = ((MidiTrack*)t)->getAutomationTrack();
+    	    if (!atrack)
+    	        return;
+			selectAutomationForTrack(t, pointer);
+    	}
 	}
-
+	else
+	{
+		selectAutomationForTrack(t, pointer);
+	}/*}}}*/
 	//printf("selectAutomation p.x()=%d p.y()=%d\n", mapx(pointer.x()), mapx(pointer.y()));
 
-	int currY = mapy(pointer.y());
+	/*int currY = mapy(pointer.y());
 	int currX = mapx(pointer.x());
 	QRect clickPoint(currX-5, currY-5, 10, 10);
 
@@ -5187,7 +5203,91 @@ void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 		}
 	}
 
+	setCursor();*/
+}/*}}}*/
+
+bool ComposerCanvas::selectAutomationForTrack(Track * t, const QPoint &pointer, Track* rt)/*{{{*/
+{
+	bool rv = false;
+	if(!rt)
+	{
+		rt = t;
+	}
+
+	//printf("selectAutomation p.x()=%d p.y()=%d\n", mapx(pointer.x()), mapx(pointer.y()));
+
+	int currY = mapy(pointer.y());
+	int currX = mapx(pointer.x());
+	QRect clickPoint(currX-5, currY-5, 10, 10);
+
+	bool foundIt = false;
+	CtrlListList* cll;
+    if (t->isMidiTrack())
+    {
+        AudioTrack* atrack = ((MidiTrack*)t)->getAutomationTrack();
+        if (!atrack)
+            return false;
+        cll = atrack->controller();
+    }
+    else
+        cll = ((AudioTrack*) t)->controller();
+
+	cll->deselectAll();
+	for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+	{
+		CtrlList *cl = icll->second;
+		if (cl->dontShow() || !cl->isVisible()) {
+			continue;
+		}
+		QPainterPath cpath = cl->curvePath();
+		if(cpath.isEmpty())
+			continue;
+
+		// Check if the mouse click intersecs an automation line
+		// NOTE: QT uses a fill pattern to deturmin if the intersection is valid.
+		// this calculation starts to break down for us when automation lines start 
+		// to cross each other. This is so far the easiest selection we have had but 
+		// try not to crown your automation lanes with lots of overlapping lines.
+		// Maybe we can implement our own class to solve this issue one day. - Andrew
+		if (cpath.intersects(clickPoint))
+		{
+			foundIt=true;
+		}
+
+		if(foundIt && automation.currentCtrlList && automation.currentCtrlList == cl)
+		{//Do nothing
+			automation.currentCtrlList->setSelected(true);
+			break;
+		}
+		else if(foundIt)
+		{
+			rv = true;
+			if(automation.currentCtrlList && automation.currentCtrlList != cl)
+				automation.currentCtrlList->setSelected(false);
+			//printf("Selecting closest automation line\n");
+			automation.controllerState = doNothing;
+			automation.currentCtrlList = cl;
+			automation.currentCtrlList->setSelected(true);
+			automation.currentTrack = t;
+			automation.currentCtrlVal = 0;
+			redraw();
+			break;
+		}
+	}
+	// if there are no hits we default to clearing all the data
+	if(!foundIt)
+	{
+		rv = false;
+		automation.controllerState = doNothing;
+		if (automation.currentCtrlVal)
+		{
+			automation.currentCtrlVal = 0;
+			redraw();
+		}
+	}
+
 	setCursor();
+	return rv;
 }/*}}}*/
 
 

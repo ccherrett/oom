@@ -272,7 +272,6 @@ void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
 			continue;
 		unsigned tick = ev.time();
 
-		// Added by T356.
 		if (doLoops)
 		{
 			if (tick >= song->lPos().tick() && tick < song->rPos().tick())

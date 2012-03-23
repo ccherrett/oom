@@ -121,6 +121,8 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
         m_controllers = ((AudioTrack*) m_track)->controller();
     }
 
+	int inputCount = 0;
+	int synthCount = 0;
 	if(m_inputTrack)
 	{
 		for (CtrlListList::iterator icll = m_inputControllers->begin(); icll != m_inputControllers->end(); ++icll)/*{{{*/
@@ -128,10 +130,13 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
     	    CtrlList *cl = icll->second;
     	    if (cl->dontShow())
     	        continue;
-			baseHeight += 18;
     	    QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
 			if(name.isEmpty())
 				continue; //I am seeing ports with no names show up, lets avoid these as they may cause us problems later
+			
+			baseHeight += 18;
+			inputCount++;
+			
 			if(name.length() > lstr)
 			{
 				lstr = name.length();
@@ -156,10 +161,13 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 	        CtrlList *cl = icll->second;
 	        if (cl->dontShow())
 	            continue;
-			baseHeight += 18;
 	        QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
 			if(name.isEmpty())
 				continue; //I am seeing ports with no names show up, lets avoid these as they may cause us problems later
+
+			baseHeight += 18;
+			synthCount++;
+
 			if(name.length() > lstr)
 			{
 				lstr = name.length();
@@ -174,6 +182,19 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 			m_listModel->appendRow(item);
 	    }/*}}}*/
 		connect(list, SIGNAL(clicked(const QModelIndex&)), this, SLOT(itemClicked(const QModelIndex&)));
+		if(m_inputTrack)
+		{
+			if(inputCount > synthCount)
+			{
+				int factor = inputCount / synthCount;
+				layout->setStretch(2, factor);
+			}
+			else
+			{
+				int factor = synthCount / inputCount;
+				layout->setStretch(3, factor);
+			}
+		}
 	}
 	
 	if(baseHeight > desktopHeight)

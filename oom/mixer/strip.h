@@ -34,6 +34,7 @@ class QSPacerItem;
 class QTabWidget;
 class QPixmap;
 class QColor;
+class TrackEffects;
 
 static const int STRIP_WIDTH = 65;
 
@@ -81,13 +82,14 @@ protected:
     QToolButton *m_btnSolo;
     QVBoxLayout *m_panBox;
     QVBoxLayout *m_autoBox;
-    QScrollArea *m_auxScroll;
-    QVBoxLayout *m_auxBox;
-	QTabWidget* m_tabWidget;
-	QWidget *m_auxTab;
-	QVBoxLayout *m_auxTabLayout;
-	QWidget *m_fxTab;
-    QVBoxLayout *rackBox;
+    //QScrollArea *m_auxScroll;
+    //QVBoxLayout *m_auxBox;
+	//QTabWidget* m_tabWidget;
+	//QWidget *m_auxTab;
+	//QVBoxLayout *m_auxTabLayout;
+	//QWidget *m_fxTab;
+    //QVBoxLayout *rackBox;
+	TrackEffects* m_effectsRack;
 
     int _curGridRow;
     Meter* meter[MAX_CHANNELS];
@@ -110,7 +112,7 @@ private slots:
     void recordToggled(bool);
     void soloToggled(bool);
     void muteToggled(bool);
-	void tabChanged(int);
+	//void tabChanged(int);
 
 protected slots:
     virtual void heartBeat();
