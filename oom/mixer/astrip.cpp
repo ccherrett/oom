@@ -447,8 +447,6 @@ void AudioStrip::songChanged(int val)/*{{{*/
 	if (val == SC_MIDI_CONTROLLER)
 		return;
 
-	AudioTrack* src = (AudioTrack*) m_track;
-
 	// Do channels before config...
 	if (val & SC_CHANNELS)
 		updateChannels();
@@ -469,23 +467,6 @@ void AudioStrip::songChanged(int val)/*{{{*/
 		slider->setRange(config.minSlider - 0.1, 10.0);
 		sl->setRange(config.minSlider, 10.0);
 
-		// Adjust minimum aux knob and label values.
-#if 0		
-		QHashIterator<int, qint64> iter(auxIndexList);
-		while(iter.hasNext())
-		{
-			iter.next();
-			if(auxKnobList[iter.value()])
-			{
-				auxKnobList[iter.value()]->blockSignals(true);
-				auxLabelList[iter.value()]->blockSignals(true);
-				auxKnobList[iter.value()]->setRange(config.minSlider - 0.1, 10.0);
-				auxLabelList[iter.value()]->setRange(config.minSlider, 10.1);
-				auxKnobList[iter.value()]->blockSignals(false);
-				auxLabelList[iter.value()]->blockSignals(false);
-			}
-		}
-#endif
 		// Adjust minimum meter values.
 		for (int c = 0; c < channel; ++c)
 			meter[c]->setRange(config.minMeter, 10.0);
@@ -494,7 +475,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 	if (m_btnMute && (val & SC_MUTE))
 	{ // m_btnMute && m_btnPower
 		m_btnMute->blockSignals(true);
-		m_btnMute->setChecked(src->mute());
+		m_btnMute->setChecked(track->isMidiTrack() ? track->mute() : m_track->mute());
 		m_btnMute->blockSignals(false);
 		updateOffState();
 	}
@@ -518,7 +499,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 		/*if (pre)
 		{
 			pre->blockSignals(true);
-			pre->setChecked(src->prefader());
+			pre->setChecked(m_track->prefader());
 			pre->blockSignals(false);
 		}*/
 	}
@@ -531,7 +512,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 			iter.next();
 			if(auxKnobList[iter.value()])
 			{
-				double val = fast_log10(src->auxSend(iter.value())) * 20.0;
+				double val = fast_log10(m_track->auxSend(iter.value())) * 20.0;
 				auxKnobList[iter.value()]->blockSignals(true);
 				auxLabelList[iter.value()]->blockSignals(true);
 				auxKnobList[iter.value()]->setValue(val);

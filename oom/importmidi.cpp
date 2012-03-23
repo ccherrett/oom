@@ -64,11 +64,15 @@ void OOMidi::importMidi(const QString &file)
 	switch (n)
 	{
 		case 0:
+			song->invalid = true;
 			importMidi(fn, true);
+			song->invalid = false;
 			song->update();
 			break;
 		case 1:
+			song->invalid = true;
 			loadProjectFile(fn, false, false); // replace
+			song->invalid = false;
 			break;
 		default:
 			return;
