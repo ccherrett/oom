@@ -144,6 +144,16 @@ void SigScale::pdraw(QPainter& p, const QRect& r)
 	//    draw location marker
 	//---------------------------------------------------
 
+	//Christopher here is your color
+	p.setPen(QColor(156,75,219));
+
+	if (pos[3] != MAXINT)
+	{
+		int xp = mapx(pos[3]);
+		if (xp >= x && xp < x + w)
+			p.drawLine(xp, 0, xp, height());
+	}
+
 	//p.setPen(Qt::red);
 	p.setPen(QColor(0, 186, 255));
 	int xp = mapx(pos[0]);

@@ -462,8 +462,9 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 	//    draw location marker
 	//---------------------------------------------------
 
-	//p.setPen(QColor(220,222,223));
-	p.setPen(colTimeLine);
+	//Christopher here is your color
+	p.setPen(QColor(156,75,219));
+
 	if (pos[3] != MAXINT)
 	{
 		int xp = mapx(pos[3]);
@@ -471,6 +472,7 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 			p.drawLine(xp, 0, xp, height());
 	}
 
+	p.setPen(colTimeLine);
 	if (barLocator)
 	{
 		p.setPen(Qt::red);
