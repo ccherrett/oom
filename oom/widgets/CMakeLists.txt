@@ -122,6 +122,8 @@ QT4_WRAP_CPP (widget_mocs
 	  TimeHeader.h
 	  TrackInstrumentMenu.h
 	  TrackEffects.h
+	  TempoCanvas.h
+	  TempoHeader.h
       )
 
 ##
@@ -276,6 +278,8 @@ file (GLOB widgets_source_files
 	  TimeHeader.cpp
 	  TrackInstrumentMenu.cpp
 	  TrackEffects.cpp
+	  TempoCanvas.cpp
+	  TempoHeader.cpp
       )
 
 ##

@@ -27,9 +27,12 @@ class QComboBox;
 class QStackedWidget;
 class QVBoxLayout;
 class QSplitter;
+class QTabWidget;
+class QStackedWidget;
 
 class ScrollScale;
 class MTScale;
+class SigScale;
 class Track;
 class Xml;
 class Splitter;
@@ -44,7 +47,15 @@ class CItem;
 class HeaderList;
 class EditToolBar;
 class TimeHeader;
+class TempoHeader;
 class CanvasNavigator;
+class TempoEdit;
+
+namespace Awl
+{
+    class SigEdit;
+};
+using Awl::SigEdit;
 
 static const int MIN_HEADER_WIDTH = 240;
 static const int MAX_HEADER_WIDTH = 400;
@@ -63,12 +74,15 @@ class Composer : public QWidget
     QScrollBar* vscroll;
 	HeaderList* m_trackheader;
     MTScale* time;
+	SigScale* m_sigRuler;
     SpinBox* lenEntry;
     Conductor* midiConductor;
 	QScrollArea *listScroll;
 	EditToolBar *edittools;
 	TimeHeader* m_timeHeader;
 	CanvasNavigator virtualScroll;
+	TempoHeader* m_tempoHeader;
+	QTabWidget* m_headerTabs;
 
     Track* selected;
 
@@ -86,11 +100,18 @@ class Composer : public QWidget
 	CommentDock* _commentdock;
 	QWidget *central;
 	QVBoxLayout *mlayout;
+	double m_tempoStart;
+	double m_tempoEnd;
+	TempoEdit *m_startTempo;
+	TempoEdit *m_endTempo;
+	SigEdit* m_sigEdit;
+	QStackedWidget* m_headerToolBox;
 
     unsigned cursVal;
     void createDockMembers();
     void updateTabs();
     bool eventFilter(QObject *obj, QEvent *event);
+	QWidget* headerCornerWidget(int tab);
 
 private slots:
     void songlenChanged(int);
@@ -104,14 +125,17 @@ private slots:
     void setTempo50();
     void setTempo100();
     void setTempo200();
-    //void seek();
 	void splitterMoved(int, int);
 	void resourceDockAreaChanged(Qt::DockWidgetArea);
 	void currentTabChanged(int);
 	void composerViewChanged();
 	void updateAll();
-	void resizeHeader(int, int);
 	void updateScroll(int, int);
+	void headerTabChanged(int);
+	void setStartTempo(double);
+	void setEndTempo(double);
+	void posChanged(int, unsigned, bool);
+    void setTimeFromSig(unsigned);
 
 signals:
     void redirectWheelEvent(QWheelEvent*);

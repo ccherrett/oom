@@ -373,7 +373,8 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 			savePreset(idx);
 			break;
 	}
-	updateContents();
+	//Already done on songChanged
+	//updateContents();
 	song->update(SC_RACK);
 }/*}}}*/
 

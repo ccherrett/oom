@@ -4,7 +4,7 @@
 //  $Id: $
 //
 //  (C) Copyright 1999/2000 Werner Schweer (ws@seh.de)
-//  (C) Copyright 2011 Andrew Williams and Christopher Cherrett
+//  (C) Copyright 2011- 2012 Andrew Williams and Christopher Cherrett
 //=========================================================
 
 #include <QAction>

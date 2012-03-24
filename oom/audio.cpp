@@ -640,6 +640,8 @@ void Audio::processMsg(AudioMsg* msg)
 			break;
 		case AUDIO_ADDPLUGIN:
 			msg->snode->addPlugin(msg->plugin, msg->ival);
+			//TODO: Trigger song->update(SC_RACK);
+			write(sigFd, "E", 1); // signal update effects to gui
 			break;
 		case AUDIO_SET_PLUGIN_CTRL_VAL:
 			//msg->plugin->track()->setPluginCtrlVal(msg->ival, msg->dval);

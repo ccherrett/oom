@@ -5,6 +5,8 @@
 //  (C) Copyright 1999-2004 Werner Schweer (ws@seh.de)
 //=========================================================
 
+#include "awl/sigedit.h"
+
 #include "config.h"
 
 #include <stdio.h>
@@ -17,9 +19,10 @@
 #include "song.h"
 #include "app.h"
 #include "mtscale.h"
+#include "sigscale.h"
+//#include "sigedit.h"
 #include "scrollscale.h"
 #include "ComposerCanvas.h"
-//#include "poslabel.h"
 #include "xml.h"
 #include "splitter.h"
 #include "lcombo.h"
@@ -48,6 +51,8 @@
 #include "toolbars/tools.h"
 #include "ClipList/AudioClipList.h"
 #include "TimeHeader.h"
+#include "TempoHeader.h"
+#include "tempolabel.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
@@ -67,6 +72,13 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	setMinimumSize(600, 50);
 
 	cursVal = MAXINT;
+	
+	m_tempoStart = tconfig().get_property("TempoRange", "start", "80.0").toDouble();
+	m_tempoEnd = tconfig().get_property("TempoRange", "end", "180.0").toDouble();
+	m_startTempo = 0;
+	m_endTempo = 0;
+	m_headerToolBox = 0;
+	m_sigEdit = 0;
 
 	//setFocusPolicy(Qt::StrongFocus);
 
@@ -126,6 +138,8 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	toolbar2->addWidget(raster);
 	connect(raster, SIGNAL(activated(int)), SLOT(_setRaster(int)));
 	connect(raster, SIGNAL(currentIndexChanged(int)), SLOT(_setRaster(int)));
+	connect(raster, SIGNAL(activated(int)), oom, SLOT(setRaster(int)));
+	connect(raster, SIGNAL(currentIndexChanged(int)), oom, SLOT(setRaster(int)));
 	///raster->setFocusPolicy(Qt::NoFocus);
 	raster->setFocusPolicy(Qt::TabFocus);
 
@@ -216,13 +230,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	split = new QSplitter(Qt::Horizontal, this);
 	split->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	split->setHandleWidth(2);
-	/*QFrame *headerFrame = new QFrame(this);
-	headerFrame->setFixedHeight(80);
-	headerFrame->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-	QHBoxLayout *headerBox = new QHBoxLayout(headerFrame);
-	headerBox->setContentsMargins(0, 0, 0, 0);
-	headerBox->setSpacing(0);*/
-	//box->addWidget(m_splitter, 1000);
 
 	m_trackheader = new HeaderList(this, "trackHeaderList");
 	m_trackheader->setMinimumWidth(MIN_HEADER_WIDTH);
@@ -245,6 +252,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	trackLayout->addWidget(m_timeHeader);
 
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), m_timeHeader, SLOT(setPos(int, unsigned, bool)));
+	connect(song, SIGNAL(posChanged(int, unsigned, bool)), this, SLOT(posChanged(int, unsigned, bool)));
 
 	edittools = new EditToolBar(this, composerTools, true);
 	edittools->setFixedHeight(32);
@@ -281,7 +289,8 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	//    Editor
 	//---------------------------------------------------
 
-	int offset = AL::sigmap.ticksMeasure(0);
+	//int offset = AL::sigmap.ticksMeasure(0);
+	int offset = -(config.division / 4);
 	hscroll = new ScrollScale(-1000, -10, xscale, song->len(), Qt::Horizontal, this, -offset);
 	hscroll->setFocusPolicy(Qt::NoFocus);
 
@@ -304,22 +313,51 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	time = new MTScale(&_raster, this, xscale);
 	time->setOrigin(-offset, 0);
 
+	m_sigRuler = new SigScale(&_raster, this, xscale);
+	m_sigRuler->setOrigin(-offset, 0);
+
 	canvas = new ComposerCanvas(&_raster, this, xscale, yscale);
 	canvas->setBg(config.partCanvasBg);
 	canvas->setCanvasTools(composerTools);
 	canvas->setOrigin(-offset, 0);
 	canvas->setFocus();
 
+	m_headerTabs = new QTabWidget(this);
+	m_headerTabs->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	m_headerTabs->setFixedHeight(80);
+	editorBox->addWidget(m_headerTabs);
+
 	virtualScroll.setCanvas(canvas);
-	editorBox->addWidget(&virtualScroll);
+	m_tempoHeader = new TempoHeader(this, xscale);
+
+	m_headerTabs->addTab(&virtualScroll, QString(tr("Navigator")));
+	m_headerTabs->addTab(m_tempoHeader, QString(tr("Tempo")));
+	m_headerTabs->setCornerWidget(headerCornerWidget(0));
+	connect(m_headerTabs, SIGNAL(currentChanged(int)), this, SLOT(headerTabChanged(int)));
+
+	m_tempoHeader->setStartTempo(m_tempoStart);
+	m_tempoHeader->setEndTempo(m_tempoEnd);
+
 	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
 	connect(canvas, SIGNAL(selectionChanged()), &virtualScroll, SLOT(updateSelections()));
 	connect(canvas, SIGNAL(trackHeightChanged()), &virtualScroll, SLOT(updateParts()));
 	connect(m_trackheader, SIGNAL(trackHeightChanged()), &virtualScroll, SLOT(updateParts()));
 	connect(&virtualScroll, SIGNAL(updateScroll(int, int)), this, SLOT(updateScroll(int, int)));
 	
+	connect(m_tempoHeader, SIGNAL(followEvent(int)), hscroll, SLOT(setOffset(int)));
+	connect(hscroll, SIGNAL(scrollChanged(int)), m_tempoHeader, SLOT(setXPos(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), m_tempoHeader, SLOT(setXMag(float)));
+	connect(edittools, SIGNAL(toolChanged(int)), m_tempoHeader, SLOT(toolChanged(int)));
+	connect(this, SIGNAL(updateHeaderTool(int)), m_tempoHeader, SLOT(toolChanged(int)));
+	connect(m_tempoHeader, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+	connect(m_sigRuler, SIGNAL(timeChanged(unsigned)), SLOT(setTimeFromSig(unsigned)));
+	//connect(m_tempoHeader, SIGNAL(tempoChanged(int), SLOT(setTempo(int)));
+
+	connect(hscroll, SIGNAL(scrollChanged(int)), m_sigRuler, SLOT(setXPos(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), m_sigRuler, SLOT(setXMag(float)));
 
 	editorBox->addWidget(time);
+	editorBox->addWidget(m_sigRuler);
 	editorBox->addWidget(hLine(this));
 	canvasBox->addWidget(canvas, 100);
 	canvasBox->addWidget(vscroll);
@@ -368,7 +406,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(toolChanged(int)), SIGNAL(toolChanged(int)));
 	//connect(canvas, SIGNAL(toolChanged(int)), edittools, SLOT(setTool(int)));
 	connect(split, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
-	//connect(m_splitter, SIGNAL(splitterMoved(int, int)),  SLOT(resizeHeader(int, int)));
 
 	configChanged(); // set configuration values
 	if (canvas->part())
@@ -379,48 +416,111 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	setTabOrder(tempo200, m_trackheader);
 	setTabOrder(m_trackheader, canvas);
 
-	QString def = QString::number(MIN_HEADER_WIDTH);
 	QList<int> vl;
-	QString str = tconfig().get_property("arsplit", "sizes", def+" 200").toString();
-	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
-	foreach(QString it, sl)
-	{
-		vl.append(it.toInt());
-	}
-	split->setSizes(vl);
-	/*vl.clear();
-	sl.clear();
-	str = tconfig().get_property("composerVSplit", "sizes", "80 400").toString();
-	sl = str.split(QString(" "), QString::SkipEmptyParts);
-	foreach(QString s, sl)
-	{
-		vl.append(s.toInt());
-	}
-	m_splitter->setSizes(vl);
-	m_timeHeader->setFixedHeight(vl[0]);
-	virtualScroll.setFixedHeight(vl[0]);*/
+	vl << MIN_HEADER_WIDTH << 200;
+	QByteArray state = tconfig().get_property("composerSettings", "splitterState", "").toByteArray();
+	if(state.isNull() || state.isEmpty())
+		split->setSizes(vl);
+	else
+		split->restoreState(state);
 }
 
 Composer::~Composer()
 {
-	QList<int> isl = split->sizes();
-	QStringList sl;
-	foreach(int i, isl)
-		sl.append(QString::number(i));
-	tconfig().set_property("arsplit", "sizes", sl.join(" "));
+	tconfig().set_property("composerSettings", "spliterState", split->saveState());
+	tconfig().set_property("TempoRange", "start", m_tempoStart);
+	tconfig().set_property("TempoRange", "end", m_tempoEnd);
 
-	/*QList<int> isl2 = m_splitter->sizes();
-	QStringList sl2;
-	foreach(int i2, isl2)
-		sl2.append(QString::number(i2));
-	tconfig().set_property("composerVSplit", "sizes", sl2.join(" "));
-	tconfig().save();*/
+	tconfig().save();
 }
 
-void Composer::resizeHeader(int pos, int)
+QWidget* Composer::headerCornerWidget(int tab)
 {
-	m_timeHeader->setFixedHeight(pos);
-	virtualScroll.setFixedHeight(pos);
+	m_headerToolBox = new QStackedWidget(this);
+	m_headerToolBox->addWidget(new QLabel());
+
+	QWidget* w = new QWidget(this);
+	QHBoxLayout* layout = new QHBoxLayout(w);
+	layout->setSpacing(0);
+	layout->setContentsMargins(0,0,0,0);
+
+	//layout->addWidget(new QLabel(tr("Tempo Range ")));
+
+	m_startTempo = new TempoEdit(w);
+	m_startTempo->setToolTip(tr("Lowest visible Tempo"));
+	layout->addWidget(m_startTempo);
+	
+	m_endTempo = new TempoEdit(w);
+	m_endTempo->setToolTip(tr("Highest visible Tempo"));
+	layout->addWidget(m_endTempo);
+	
+	//TODO: Add sigedit
+	m_sigEdit = new SigEdit(0);
+	m_sigEdit->setValue(AL::TimeSignature(4, 4));
+	m_sigEdit->setToolTip(tr("Time signature at current position"));
+	connect(m_sigEdit, SIGNAL(valueChanged(const AL::TimeSignature&)), song, SLOT(setSig(const AL::TimeSignature&)));
+	layout->addSpacing(4);
+	layout->addWidget(m_sigEdit);
+	layout->addSpacing(6);
+
+	w->setFixedHeight(18);
+	m_headerToolBox->addWidget(w);
+
+	connect(m_startTempo, SIGNAL(tempoChanged(double)), m_tempoHeader, SLOT(setStartTempo(double)));
+	connect(m_endTempo, SIGNAL(tempoChanged(double)), m_tempoHeader, SLOT(setEndTempo(double)));
+	connect(m_startTempo, SIGNAL(tempoChanged(double)), this, SLOT(setStartTempo(double)));
+	connect(m_endTempo, SIGNAL(tempoChanged(double)), this, SLOT(setEndTempo(double)));
+	m_startTempo->setValue(m_tempoStart);
+	m_endTempo->setValue(m_tempoEnd);
+	
+	m_headerToolBox->setCurrentIndex(tab);
+	return m_headerToolBox;
+}
+
+void Composer::headerTabChanged(int tab)
+{
+	if(m_headerToolBox)
+		m_headerToolBox->setCurrentIndex(tab);
+}
+
+void Composer::setStartTempo(double tempo)
+{
+	if(tempo >= m_tempoEnd)
+	{
+		if(m_startTempo)
+			m_startTempo->setValue(m_tempoStart);
+	}
+	else
+		m_tempoStart = tempo;
+}
+
+void Composer::setEndTempo(double tempo)
+{
+	if(tempo <= m_tempoStart)
+	{
+		if(m_endTempo)
+			m_endTempo->setValue(m_tempoEnd);
+	}
+	else
+		m_tempoEnd = tempo;
+}
+
+void Composer::posChanged(int idx, unsigned val, bool)
+{
+	if (idx == 0)
+	{
+		if(m_sigEdit)
+		{
+			int z, n;
+			AL::sigmap.timesig(val, z, n);
+			m_sigEdit->blockSignals(true);
+			m_sigEdit->setValue(AL::TimeSignature(z, n));
+			m_sigEdit->blockSignals(false);
+		}
+	}
+	cursVal = val;
+	m_timeHeader->setTime(val);
+	time->setPos(3, val, false);
 }
 
 void Composer::heartBeat()
@@ -472,19 +572,30 @@ void Composer::currentTabChanged(int tab)
 //   setTime
 //---------------------------------------------------------
 
-void Composer::setTime(unsigned tick)
+void Composer::setTime(unsigned tick)/*{{{*/
 {
 	if (tick == MAXINT)
 		return;
 	else
 	{
 		cursVal = tick;
-		//cursorPos->setEnabled(true);
-		//cursorPos->setValue(tick);
+		m_timeHeader->setTime(tick);
+		time->setPos(3, tick, false);
+		m_sigRuler->setPos(3, tick, false);
+	}
+}/*}}}*/
+
+void Composer::setTimeFromSig(unsigned tick)/*{{{*/
+{
+	if (tick == MAXINT)
+		return;
+	else
+	{
+		cursVal = tick;
 		m_timeHeader->setTime(tick);
 		time->setPos(3, tick, false);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   toolChange
@@ -550,10 +661,16 @@ void Composer::composerViewChanged()
 void Composer::updateAll()
 {
 	unsigned endTick = song->len();
-	int offset = AL::sigmap.ticksMeasure(endTick);
-	hscroll->setRange(-offset, endTick + offset); //DEBUG
+	//int offset = AL::sigmap.ticksMeasure(endTick);
+	/*hscroll->setRange(-offset, endTick + offset); //DEBUG
 	canvas->setOrigin(-offset, 0);
-	time->setOrigin(-offset, 0);
+	time->setOrigin(-offset, 0);*/
+
+	int offset = -(config.division / 4);
+	hscroll->setRange(offset, endTick + offset); //DEBUG
+	canvas->setOrigin(offset, 0);
+	time->setOrigin(offset, 0);
+	m_sigRuler->setOrigin(offset, 0);
 
 	int bar, beat;
 	unsigned tick;
@@ -603,6 +720,15 @@ void Composer::songChanged(int type)
 		}
 		//if (type & SC_SELECTION)
 		//	virtualScroll.updateSelections();
+		if (m_sigEdit && (type & SC_SIG))
+		{
+			int z, n;
+			AL::sigmap.timesig(song->cpos(), z, n);
+			m_sigEdit->blockSignals(true);
+			m_sigEdit->setValue(AL::TimeSignature(z, n));
+			m_sigEdit->blockSignals(false);
+			m_sigRuler->redraw();
+		}
 	}
 
 	updateConductor(type);
@@ -829,6 +955,7 @@ void Composer::reset()
 	vscroll->setValue(0);
 	time->setXPos(0);
 	time->setYPos(0);
+	m_sigRuler->setXPos(0);
 }
 
 void Composer::updateScroll(int x, int y)

@@ -86,7 +86,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	setFixedHeight(80);
+	setFixedHeight(60);
 
 	m_scene = new NavigatorScene(QRectF());
 	m_scene->setBackgroundBrush(QColor(63, 63, 63));
@@ -96,7 +96,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-	m_view->setFixedHeight(80);
+	m_view->setFixedHeight(60);
 	layout->addWidget(m_view);
 	setFocusPolicy(Qt::NoFocus);
 	m_view->setFocusPolicy(Qt::NoFocus);
@@ -123,6 +123,7 @@ void CanvasNavigator::updateCanvasPosition(int x, int y)
 	{
 		int pos = ((m_canvas->mapx(sceneToTick(x))+m_canvas->xOffsetDev())-(m_canvas->width()/2));
 		int ypos = sceneToCanvas(y)-200;
+		//int ypos = sceneToCanvas(y);
 		emit updateScroll(pos, ypos);
 	}
 }
@@ -334,6 +335,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 	int kpos = 0;
 	foreach(int i, m_heightList)
 		kpos += i;
+	//kpos = ((kpos + 400) * 8)/100;
 	kpos = ((kpos + 400) * 8)/100;
 	
 	m_playhead = new QGraphicsRectItem(0, 0, 1, kpos);

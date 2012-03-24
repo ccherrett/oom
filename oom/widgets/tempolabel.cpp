@@ -33,11 +33,13 @@ TempoLabel::TempoLabel(QWidget* parent, const char* name)
 
 void TempoLabel::setValue(int val)
 {
+	//qDebug("TempoLabel::setValue: %d", val);
 	setValue(double(val / 1000.0));
 }
 
 void TempoLabel::setValue(double val)
 {
+	//qDebug("TempoLabel::setValue: %f", val);
 	if (val == _value)
 		return;
 	_value = val;
@@ -67,7 +69,7 @@ TempoEdit::TempoEdit(QWidget* parent)
 {
 	curVal = -1.0;
 	setSingleStep(1.0);
-	setRange(30.0, 600.0);
+	setRange(30.0, 250.0);
 	connect(this, SIGNAL(valueChanged(double)), SLOT(newValue(double)));
 }
 

@@ -20,6 +20,8 @@
 #include <QFileInfo>
 #include <QPair>
 
+#include "al/sig.h"
+
 class QCloseEvent;
 class QFocusEvent;
 class QMainWindow;
@@ -235,6 +237,7 @@ class OOMidi : public QMainWindow
 	
 	QString m_initProjectName;
 	bool m_useTemplate;
+	int m_rasterVal;
 	
 	//-------------------------------------------------------------
 	// Instrument Templates
@@ -432,6 +435,11 @@ public slots:
 	void showUndoView();
     
     Tool getCurrentTool();
+	void setRaster(int r)
+	{
+		m_rasterVal = r;
+	}
+
 
 public:
     OOMidi(int argc, char** argv);
@@ -498,6 +506,26 @@ public:
 	void addGlobalInput(QPair<int, QString> pinfo);
 	void initGlobalInputPorts();
 
+    int rasterStep(unsigned tick) const/*{{{*/
+    {
+        return AL::sigmap.rasterStep(tick, m_rasterVal);
+    }
+
+    unsigned rasterVal(unsigned v) const
+    {
+        return AL::sigmap.raster(v, m_rasterVal);
+    }
+
+    unsigned rasterVal1(unsigned v) const
+    {
+        return AL::sigmap.raster1(v, m_rasterVal);
+    }
+
+    unsigned rasterVal2(unsigned v) const
+    {
+        return AL::sigmap.raster2(v, m_rasterVal);
+    }/*}}}*/
+	int raster(){return m_rasterVal;}
 #ifdef HAVE_LASH
     void lash_idle_cb();
 #endif

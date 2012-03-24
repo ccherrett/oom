@@ -668,6 +668,11 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 					}
 				}
 			}
+			else if(text.endsWith(".mid", Qt::CaseInsensitive) ||
+				text.endsWith(".kar", Qt::CaseInsensitive))
+			{
+				oom->importMidi(text);
+			}
 		}
 		else
 	    	event->ignore();

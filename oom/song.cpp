@@ -2956,6 +2956,11 @@ void Song::seqSignal(int fd)/*{{{*/
 					audioDevice->registrationChanged();
 				break;
 
+			case 'E':
+			{
+				update(SC_RACK);
+			}
+				break;
 			default:
 				printf("unknown Seq Signal <%c>\n", buffer[i]);
 				break;

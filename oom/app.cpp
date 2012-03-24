@@ -588,6 +588,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	firstrun = true;
 	m_externalCall = false;
 	performer = 0;
+	m_rasterVal = 0;
 
 	g_trackColorListLine.insert(Track::AUDIO_INPUT, QColor(189,122,214));
 	g_trackColorListLine.insert(Track::MIDI, QColor(1,230,238));

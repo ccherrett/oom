@@ -45,6 +45,8 @@ void LSThread::run()/*{{{*/
 				lscmd = config.lsClientLSPath;
 			QStringList lsargs = lscmd.split(" ");
 			lscmd = lsargs.takeFirst();
+			if(lsargs.isEmpty() || !lsargs.contains("--lscp-addr"))
+				lsargs << "--lscp-addr" << "127.0.0.1";
 			if(lsargs.isEmpty())
 			{
 				m_process->start(lscmd);

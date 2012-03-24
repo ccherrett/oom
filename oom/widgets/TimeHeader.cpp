@@ -30,7 +30,7 @@ TimeHeader::TimeHeader(QWidget* parent)
 	m_layout->setContentsMargins(0,0,0,0);
 	m_layout->setSpacing(0);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-	setFixedHeight(80);
+	setFixedHeight(98);
 	
 	QHBoxLayout* timeBox = new QHBoxLayout;
 	timeBox->setContentsMargins(0,0,0,0);
