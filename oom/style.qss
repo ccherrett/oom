@@ -1044,7 +1044,7 @@ QFrame#doubleSliderMiddle
 	border-bottom: 4px;
 	border-left: 0px;
 	border-right: 0px;
-	border-image: url(:/images/doubleslider_border.png) repeat;
+	border-image: url(:/images/doubleslider_middle_border.png) repeat;
 	padding-top: -4px;
 	padding-bottom: -4px;
 }
