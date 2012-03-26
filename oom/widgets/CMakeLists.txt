@@ -124,6 +124,7 @@ QT4_WRAP_CPP (widget_mocs
 	  TrackEffects.h
 	  TempoCanvas.h
 	  TempoHeader.h
+	  DoubleSlider.h
       )
 
 ##
@@ -280,6 +281,7 @@ file (GLOB widgets_source_files
 	  TrackEffects.cpp
 	  TempoCanvas.cpp
 	  TempoHeader.cpp
+	  DoubleSlider.cpp
       )
 
 ##

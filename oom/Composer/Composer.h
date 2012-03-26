@@ -50,6 +50,7 @@ class TimeHeader;
 class TempoHeader;
 class CanvasNavigator;
 class TempoEdit;
+class DoubleSlider;
 
 namespace Awl
 {
@@ -106,6 +107,7 @@ class Composer : public QWidget
 	TempoEdit *m_endTempo;
 	SigEdit* m_sigEdit;
 	QStackedWidget* m_headerToolBox;
+	DoubleSlider* m_tempoRange;
 
     unsigned cursVal;
     void createDockMembers();

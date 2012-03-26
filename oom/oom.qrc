@@ -40,8 +40,6 @@
 		<file>images/spindown_hover.png</file>
 		<file>images/spindown_pressed.png</file>
 		<file>images/toolbar_handle.png</file>
-		<file>images/slider_thumb.png</file>
-		<file>images/slider_thumb_h.png</file>
 		<file>images/knob.png</file>
 		<file>images/knob_aux.png</file>
 		<file>images/icons/add_tracks.png</file>
@@ -378,7 +376,10 @@
 		<file>images/icons/mixer_blank_new_off.png</file>
 		<file>images/slider_thumb_new.png</file>
 		<file>images/slider_thumb_new_h.png</file>
+		<file>images/slider_thumb_new_small.png</file>
+		<file>images/slider_thumb_new_h_small.png</file>
 		<file>images/slider_thumb_small.png</file>
+		<file>images/doubleslider_border.png</file>
 		<file>images/icons/mixer_new_on.png</file>
 		<file>images/icons/mixer_new_over.png</file>
 		<file>images/icons/mixer_new_off.png</file>

@@ -53,6 +53,7 @@
 #include "TimeHeader.h"
 #include "TempoHeader.h"
 #include "tempolabel.h"
+#include "DoubleSlider.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
@@ -79,6 +80,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	m_endTempo = 0;
 	m_headerToolBox = 0;
 	m_sigEdit = 0;
+	m_tempoRange = 0;
 
 	//setFocusPolicy(Qt::StrongFocus);
 
@@ -446,13 +448,21 @@ QWidget* Composer::headerCornerWidget(int tab)
 
 	//layout->addWidget(new QLabel(tr("Tempo Range ")));
 
-	m_startTempo = new TempoEdit(w);
-	m_startTempo->setToolTip(tr("Lowest visible Tempo"));
-	layout->addWidget(m_startTempo);
+	//m_startTempo = new TempoEdit(w);
+	//m_startTempo->setToolTip(tr("Lowest visible Tempo"));
+	//layout->addWidget(m_startTempo);
 	
-	m_endTempo = new TempoEdit(w);
-	m_endTempo->setToolTip(tr("Highest visible Tempo"));
-	layout->addWidget(m_endTempo);
+	//m_endTempo = new TempoEdit(w);
+	//m_endTempo->setToolTip(tr("Highest visible Tempo"));
+	//layout->addWidget(m_endTempo);
+
+	m_tempoRange = new DoubleSlider(true, this);
+	m_tempoRange->setRange(30.0, 250.0);
+	m_tempoRange->setCurrentMin(m_tempoStart);
+	m_tempoRange->setCurrentMax(m_tempoEnd);
+	m_tempoRange->setFixedHeight(12);
+	layout->addWidget(m_tempoRange);
+	//m_headerToolBox->addWidget(m_tempoRange);
 	
 	//TODO: Add sigedit
 	m_sigEdit = new SigEdit(0);
@@ -463,15 +473,13 @@ QWidget* Composer::headerCornerWidget(int tab)
 	layout->addWidget(m_sigEdit);
 	layout->addSpacing(6);
 
-	w->setFixedHeight(18);
+	w->setFixedHeight(16);
 	m_headerToolBox->addWidget(w);
 
-	connect(m_startTempo, SIGNAL(tempoChanged(double)), m_tempoHeader, SLOT(setStartTempo(double)));
-	connect(m_endTempo, SIGNAL(tempoChanged(double)), m_tempoHeader, SLOT(setEndTempo(double)));
-	connect(m_startTempo, SIGNAL(tempoChanged(double)), this, SLOT(setStartTempo(double)));
-	connect(m_endTempo, SIGNAL(tempoChanged(double)), this, SLOT(setEndTempo(double)));
-	m_startTempo->setValue(m_tempoStart);
-	m_endTempo->setValue(m_tempoEnd);
+	connect(m_tempoRange, SIGNAL(minChanged(double)), m_tempoHeader, SLOT(setStartTempo(double)));
+	connect(m_tempoRange, SIGNAL(maxChanged(double)), m_tempoHeader, SLOT(setEndTempo(double)));
+	connect(m_tempoRange, SIGNAL(minChanged(double)), this, SLOT(setStartTempo(double)));
+	connect(m_tempoRange, SIGNAL(maxChanged(double)), this, SLOT(setEndTempo(double)));
 	
 	m_headerToolBox->setCurrentIndex(tab);
 	return m_headerToolBox;
@@ -487,8 +495,8 @@ void Composer::setStartTempo(double tempo)
 {
 	if(tempo >= m_tempoEnd)
 	{
-		if(m_startTempo)
-			m_startTempo->setValue(m_tempoStart);
+		if(m_tempoRange)
+			m_tempoRange->setCurrentMin(m_tempoStart);
 	}
 	else
 		m_tempoStart = tempo;
@@ -498,8 +506,8 @@ void Composer::setEndTempo(double tempo)
 {
 	if(tempo <= m_tempoStart)
 	{
-		if(m_endTempo)
-			m_endTempo->setValue(m_tempoEnd);
+		if(m_tempoRange)
+			m_tempoRange->setCurrentMax(m_tempoEnd);
 	}
 	else
 		m_tempoEnd = tempo;
@@ -521,6 +529,7 @@ void Composer::posChanged(int idx, unsigned val, bool)
 	cursVal = val;
 	m_timeHeader->setTime(val);
 	time->setPos(3, val, false);
+	m_sigRuler->setPos(3, val, false);
 }
 
 void Composer::heartBeat()

@@ -1007,7 +1007,7 @@ QCheckBox::disabled, QComboBox::disabled, QLabel::disabled, QMenu::disabled, QPu
         color: #29292E;
 }
 
-QSplitter::handle{
+QSplitter::handle{/*{{{*/
 background-color: #2f2f2f;
 /*width: 2px;*/
 }
@@ -1018,8 +1018,58 @@ QSplitter::handle:horizontal {
 
 QSplitter::handle:vertical {
 	height: 2px;
+}/*}}}*/
+
+/*SliderSplitter::handle
+{
+    background-color: none;
+	image: url(:images/slider_thumb_new_small.png)
+}
+*/
+
+SliderSplitter::handle:horizontal
+{
+     /*width: 8px;*/
+	image: url(:images/slider_thumb_new_small.png)
 }
 
+/*SliderSplitter::handle:vertical
+{
+	height: 8px;
+}*/
+
+QFrame#doubleSliderMiddle
+{
+	border-top: 4px;
+	border-bottom: 4px;
+	border-left: 0px;
+	border-right: 0px;
+	border-image: url(:/images/doubleslider_border.png) repeat;
+	padding-top: -4px;
+	padding-bottom: -4px;
+}
+
+QFrame#doubleSliderLeft
+{
+	border-top: 4px;
+	border-bottom: 4px;
+	border-left: 0px;
+	border-right: 0px;
+	border-image: url(:/images/doubleslider_border.png) repeat;
+	padding-top: -4px;
+	padding-bottom: -4px;
+}
+
+QFrame#doubleSliderRight, QFrame#doubleSliderContainer
+{
+	border-top: 4px;
+	border-bottom: 4px;
+	border-left: 0px;
+	border-right: 0px;
+	border-image: url(:/images/doubleslider_border.png) repeat;
+	padding-top: -4px;
+	padding-bottom: -4px;
+}
 
 QFrame, QWidget#CCEditBase { 
 border: 0px solid #525252;

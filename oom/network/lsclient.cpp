@@ -528,6 +528,8 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 					MidiInstrument *midiInstr = new MidiInstrument(insName);
 					MidiController *modCtrl = new MidiController("Modulation", CTRL_MODULATION, 0, 127, 0);
 					MidiController *expCtrl = new MidiController("Expression", CTRL_EXPRESSION, 0, 127, 0);
+					midiInstr->setDefaultPan(0.0);
+					midiInstr->setDefaultVerb(config.minSlider);
 					midiInstr->controller()->add(modCtrl);
 					midiInstr->controller()->add(expCtrl);
 					midiInstr->setOOMInstrument(true);
