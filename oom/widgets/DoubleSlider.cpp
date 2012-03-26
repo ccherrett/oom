@@ -205,8 +205,8 @@ void DoubleSlider::setCurrentMin(double currentMin)
 		
 	if (_currentMin > _currentMax)
 	{
-		this->setCurrentMax(currentMin);
-		emit maxChanged(_currentMin);
+		this->updateCurrentMax(currentMin+1);
+		//emit maxChanged(_currentMax);
 	}
 		
 	this->updateMinPos();
@@ -222,8 +222,8 @@ void DoubleSlider::setCurrentMax(double currentMax)
 		
 	if (_currentMax < _currentMin)
 	{
-		this->setCurrentMin(currentMax);
-		emit minChanged(_currentMax);
+		this->updateCurrentMin(currentMax-1);
+		//emit minChanged(_currentMin);
 	}
 		
 	this->updateMaxPos();
