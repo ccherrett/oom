@@ -19,10 +19,9 @@
 //=============================================================================
 
 
-///#include "al.h"
-#include "gconfig.h"  // Tim
+#include "gconfig.h"
+#include "globals.h"
 #include "sig.h"
-///#include "xml.h"
 
 
 namespace AL {
@@ -74,15 +73,16 @@ namespace AL {
 	{
 		if (s.z == 0 || s.n == 0)
 		{
-			printf("illegal signature %d/%d\n", s.z, s.n);
-			// Added by Tim.
+			if(debugMsg)
+				printf("illegal signature %d/%d\n", s.z, s.n);
 			return;
 		}
 		tick = raster1(tick, 0);
 		iSigEvent e = upper_bound(tick);
 		if (e == end())
 		{
-			printf("SigList::add Signal not found tick:%d\n", tick);
+			if(debugMsg)
+				printf("SigList::add Signal not found tick:%d\n", tick);
 			return;
 		}
 
@@ -101,38 +101,6 @@ namespace AL {
 		normalize();
 	}
 
-	/*
-	void SigList::add(unsigned tick, int z, int n)
-		  {
-		  if (z == 0 || n == 0) {
-				printf("SigList::add illegal signature %d/%d\n", z, n);
-				// Added by Tim.
-				return;
-				}
-		  tick = raster1(tick, 0);
-		  iSigEvent e = upper_bound(tick);
-		  if(e == end())
-		  {
-			printf("SigList::add Signal not found tick:%d\n", tick);
-			return;
-		  }
-      
-		  if (tick == e->second->tick) {
-				e->second->sig.z = z;
-				e->second->sig.n = n;
-				}
-		  else {
-				SigEvent* ne = e->second;
-				SigEvent* ev = new SigEvent(ne->sig.z, ne->sig.n, ne->tick);
-				ne->sig.z = z;
-				ne->sig.n = n;
-				ne->tick = tick;
-				insert(std::pair<const unsigned, SigEvent*> (tick, ev));
-				}
-		  normalize();
-		  }
-	 */
-
 	//---------------------------------------------------------
 	//   del
 	//---------------------------------------------------------
@@ -143,14 +111,16 @@ namespace AL {
 		iSigEvent e = find(tick);
 		if (e == end())
 		{
-			printf("SigList::del(%d): not found\n", tick);
+			if(debugMsg)
+				printf("SigList::del(%d): not found\n", tick);
 			return;
 		}
 		iSigEvent ne = e;
 		++ne;
 		if (ne == end())
 		{
-			printf("SigList::del() next event not found!\n");
+			if(debugMsg)
+				printf("SigList::del() next event not found!\n");
 			return;
 		}
 		ne->second->sig = e->second->sig;
@@ -238,8 +208,8 @@ namespace AL {
 		ciSigEvent i = upper_bound(tick);
 		if (i == end())
 		{
-			printf("ticksMeasure: not found %d\n", tick);
-			// abort();
+			if(debugMsg)
+				printf("ticksMeasure: not found %d\n", tick);
 			return 0;
 		}
 		return ticksMeasure(i->second->sig);
@@ -254,7 +224,8 @@ namespace AL {
 		ciSigEvent i = upper_bound(tick);
 		if (i == end())
 		{
-			printf("SigList::ticksBeat event not found! tick:%d\n", tick);
+			if(debugMsg)
+				printf("SigList::ticksBeat event not found! tick:%d\n", tick);
 			return 0;
 		}
 		return ticks_beat(i->second->sig.n);
@@ -299,8 +270,8 @@ namespace AL {
 		ciSigEvent i = upper_bound(tick);
 		if (i == end())
 		{
-			printf("timesig(%d): not found\n", tick);
-			// abort();
+			if(debugMsg)
+				printf("timesig(%d): not found\n", tick);
 			return TimeSignature(4, 4);
 		}
 		return i->second->sig;
@@ -311,8 +282,8 @@ namespace AL {
 		ciSigEvent i = upper_bound(tick);
 		if (i == end())
 		{
-			printf("timesig(%d): not found\n", tick);
-			// abort();
+			if(debugMsg)
+				printf("timesig(%d): not found\n", tick);
 			z = 4;
 			n = 4;
 		}
@@ -332,7 +303,8 @@ namespace AL {
 		ciSigEvent e = upper_bound(t);
 		if (e == end())
 		{
-			fprintf(stderr, "tickValues(0x%x) not found(%zd)\n", t, size());
+			if(debugMsg)
+				fprintf(stderr, "tickValues(0x%x) not found(%zd)\n", t, size());
 			*bar = 0;
 			*beat = 0;
 			*tick = 0;
@@ -384,8 +356,8 @@ namespace AL {
 		ciSigEvent e = upper_bound(t);
 		if (e == end())
 		{
-			printf("SigList::raster(%x,)\n", t);
-			// abort();
+			if(debugMsg)
+				printf("SigList::raster(%x,)\n", t);
 			return t;
 		}
 		int delta = t - e->second->tick;
@@ -409,8 +381,8 @@ namespace AL {
 		ciSigEvent e = upper_bound(t);
 		if (e == end())
 		{
-			printf("SigList::raster1 event not found tick:%d\n", t);
-			//return 0;
+			if(debugMsg)
+				printf("SigList::raster1 event not found tick:%d\n", t);
 			return t;
 		}
 
@@ -435,8 +407,8 @@ namespace AL {
 		ciSigEvent e = upper_bound(t);
 		if (e == end())
 		{
-			printf("SigList::raster2 event not found tick:%d\n", t);
-			//return 0;
+			if(debugMsg)
+				printf("SigList::raster2 event not found tick:%d\n", t);
 			return t;
 		}
 
@@ -460,8 +432,8 @@ namespace AL {
 			ciSigEvent e = upper_bound(t);
 			if (e == end())
 			{
-				printf("SigList::rasterStep event not found tick:%d\n", t);
-				//return 0;
+				if(debugMsg)
+					printf("SigList::rasterStep event not found tick:%d\n", t);
 				return raster;
 			}
 
@@ -474,17 +446,6 @@ namespace AL {
 	//   SigList::write
 	//---------------------------------------------------------
 
-#if 0
-
-void SigList::write(Xml& xml) const
-	{
-		xml.stag("siglist");
-		for (ciSigEvent i = begin(); i != end(); ++i)
-			i->second->write(xml, i->first);
-		xml.etag("siglist");
-	}
-#endif
-
 	void SigList::write(int level, Xml& xml) const
 	{
 		xml.tag(level++, "siglist");
@@ -496,30 +457,6 @@ void SigList::write(Xml& xml) const
 	//---------------------------------------------------------
 	//   SigList::read
 	//---------------------------------------------------------
-
-#if 0
-
-void SigList::read(QDomNode node)
-	{
-		while (!node.isNull())
-		{
-			QDomElement e = node.toElement();
-			if (e.tagName() == "sig")
-			{
-				SigEvent* t = new SigEvent();
-				unsigned tick = t->read(node);
-				iSigEvent pos = find(tick);
-				if (pos != end())
-					erase(pos);
-				insert(std::pair<const unsigned, SigEvent*> (tick, t));
-			}
-			else
-				printf("OOMidi:SigList: unknown tag %s\n", e.tagName().toLatin1().constData());
-			node = node.nextSibling();
-		}
-		normalize();
-	}
-#endif
 
 	void SigList::read(Xml& xml)
 	{
@@ -563,18 +500,6 @@ void SigList::read(QDomNode node)
 	//   SigEvent::write
 	//---------------------------------------------------------
 
-#if 0
-
-void SigEvent::write(Xml& xml, int at) const
-	{
-		xml.stag(QString("sig at=\"%1\"").arg(at));
-		xml.tag("tick", tick);
-		xml.tag("nom", sig.z);
-		xml.tag("denom", sig.n);
-		xml.etag("sig");
-	}
-#endif
-
 	void SigEvent::write(int level, Xml& xml, int at) const
 	{
 		xml.tag(level++, "sig at=\"%d\"", at);
@@ -588,68 +513,41 @@ void SigEvent::write(Xml& xml, int at) const
 	//   SigEvent::read
 	//---------------------------------------------------------
 
-#if 0
-
-int SigEvent::read(QDomNode node)
+	int SigEvent::read(Xml& xml)
 	{
-		QDomElement e = node.toElement();
-		int at = e.attribute("at", "0").toInt();
-		node = node.firstChild();
-
-		while (!node.isNull())
+		int at = 0;
+		for (;;)
 		{
-			QDomElement e = node.toElement();
-			if (e.tagName() == "tick")
-				tick = e.text().toInt();
-			else if (e.tagName() == "nom")
-				sig.z = e.text().toInt();
-			else if (e.tagName() == "denom")
-				sig.n = e.text().toInt();
-			else
-				printf("OOMidi:SigEvent: unknown tag %s\n", e.tagName().toLatin1().constData());
-			node = node.nextSibling();
+			Xml::Token token = xml.parse();
+			const QString& tag = xml.s1();
+			switch (token)
+			{
+				case Xml::Error:
+				case Xml::End:
+					return 0;
+				case Xml::TagStart:
+					if (tag == "tick")
+						tick = xml.parseInt();
+					else if (tag == "nom")
+						sig.z = xml.parseInt();
+					else if (tag == "denom")
+						sig.n = xml.parseInt();
+					else
+						xml.unknown("SigEvent");
+					break;
+				case Xml::Attribut:
+					if (tag == "at")
+						at = xml.s2().toInt();
+					break;
+				case Xml::TagEnd:
+					if (tag == "sig")
+						return at;
+				default:
+					break;
+			}
 		}
-		return at;
+		return 0;
 	}
-
-}
-#endif
-
-int SigEvent::read(Xml& xml)
-{
-	int at = 0;
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return 0;
-			case Xml::TagStart:
-				if (tag == "tick")
-					tick = xml.parseInt();
-				else if (tag == "nom")
-					sig.z = xml.parseInt();
-				else if (tag == "denom")
-					sig.n = xml.parseInt();
-				else
-					xml.unknown("SigEvent");
-				break;
-			case Xml::Attribut:
-				if (tag == "at")
-					at = xml.s2().toInt();
-				break;
-			case Xml::TagEnd:
-				if (tag == "sig")
-					return at;
-			default:
-				break;
-		}
-	}
-	return 0;
-}
 
 
 } // namespace AL

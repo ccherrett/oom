@@ -92,10 +92,12 @@ void SigScale::viewMouseMoveEvent(QMouseEvent* event)
 			i = 2;
 			break;
 		default:
-			return;
+			i = 3;
+			break;
 	}
 	Pos p(x, true);
 	song->setPos(i, p);
+	redraw();
 }
 
 //---------------------------------------------------------

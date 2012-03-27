@@ -43,7 +43,7 @@ enum
     SEQM_ADD_TRACK, SEQM_REMOVE_TRACK, SEQM_CHANGE_TRACK, SEQM_MOVE_TRACK,
     SEQM_ADD_PART, SEQM_REMOVE_PART, SEQM_REMOVE_PART_LIST, SEQM_CHANGE_PART,
     SEQM_ADD_EVENT, SEQM_ADD_EVENT_CHECK, SEQM_REMOVE_EVENT, SEQM_CHANGE_EVENT,
-    SEQM_ADD_TEMPO, SEQM_SET_TEMPO, SEQM_REMOVE_TEMPO, SEQM_ADD_SIG, SEQM_REMOVE_SIG,
+    SEQM_ADD_TEMPO, SEQM_SET_TEMPO, SEQM_REMOVE_TEMPO, SEQM_REMOVE_TEMPO_RANGE, SEQM_ADD_SIG, SEQM_REMOVE_SIG,
     SEQM_SET_GLOBAL_TEMPO,
     SEQM_UNDO, SEQM_REDO,
     SEQM_RESET_DEVICES, SEQM_INIT_DEVICES, SEQM_PANIC,
@@ -112,6 +112,7 @@ struct AudioMsg : public ThreadMsg
     Pos pos;
 	QList<qint64> list;
 	QList<Part*> plist;
+	QList<void*> objectList;
 };
 
 //---------------------------------------------------------
@@ -257,6 +258,7 @@ public:
     void msgSetAux(AudioTrack*, qint64, double);
     void msgSetGlobalTempo(int val);
     void msgDeleteTempo(int tick, int tempo, bool doUndoFlag = true);
+    void msgDeleteTempoRange(QList<void*> tempo, bool doUndoFlag = true);
     void msgAddSig(int tick, int z, int n, bool doUndoFlag = true);
     void msgRemoveSig(int tick, int z, int n, bool doUndoFlag = true);
     void msgShowInstrumentGui(MidiInstrument*, bool);

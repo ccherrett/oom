@@ -88,6 +88,7 @@ public:
     void setTempo(unsigned tick, int newTempo);
     void addTempo(unsigned t, int tempo);
     void delTempo(unsigned tick);
+	void delTempoRange(unsigned start, unsigned end);
     void changeTempo(unsigned tick, int newTempo);
     bool setMasterFlag(unsigned tick, bool val);
 

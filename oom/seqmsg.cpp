@@ -987,6 +987,18 @@ void Audio::msgDeleteTempo(int tick, int tempo, bool doUndoFlag)
 }
 
 //---------------------------------------------------------
+//   msgDeleteTempoRange
+//---------------------------------------------------------
+
+void Audio::msgDeleteTempoRange(QList<void*> tempo, bool doUndoFlag)
+{
+	AudioMsg msg;
+	msg.id = SEQM_REMOVE_TEMPO_RANGE;
+	msg.objectList = tempo;
+	sendMessage(&msg, doUndoFlag);
+}
+
+//---------------------------------------------------------
 //   msgAddSig
 //---------------------------------------------------------
 

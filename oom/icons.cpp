@@ -914,9 +914,9 @@ void initIcons()
       stickIcon    = new MPIXMAP(stick_xpm, NULL);
       waveIcon     = new MPIXMAP(wave_xpm, NULL);
       synthIcon    = new MPIXMAP(synth_xpm, NULL);
-      markIcon[0]  = new MPIXMAP(cmark_xpm, NULL);
-      markIcon[1]  = new MPIXMAP(lmark_xpm, NULL);
-      markIcon[2]  = new MPIXMAP(rmark_xpm, NULL);
+      markIcon[0]  = new MPIXMAP(":/images/icons/cmark.png", NULL);
+      markIcon[1]  = new MPIXMAP(":/images/icons/lmark.png", NULL);
+      markIcon[2]  = new MPIXMAP(":/images/icons/rmark.png", NULL);
       cutIcon      = new MPIXMAP(":/images/icons/split.png", NULL);
       //steprecIcon  = new MPIXMAP(steprec_xpm, NULL);
       steprecIcon  = new MPIXMAP(":/images/icons/step_by_step.png", NULL);

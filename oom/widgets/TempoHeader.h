@@ -30,6 +30,7 @@ public slots:
 	void toolChanged(int);
 	void setStartTempo(double);
 	void setEndTempo(double);
+    void setOrigin(int x, int y);
 
 signals:
     void updateXMag(float);

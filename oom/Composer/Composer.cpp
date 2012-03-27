@@ -293,7 +293,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	//int offset = AL::sigmap.ticksMeasure(0);
 	int offset = -(config.division / 4);
-	hscroll = new ScrollScale(-1000, -10, xscale, song->len(), Qt::Horizontal, this, -offset);
+	hscroll = new ScrollScale(-1000, -10, xscale, song->len(), Qt::Horizontal, this, offset);
 	hscroll->setFocusPolicy(Qt::NoFocus);
 
 	vscroll = new QScrollBar(Qt::Vertical, this);
@@ -331,6 +331,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	virtualScroll.setCanvas(canvas);
 	m_tempoHeader = new TempoHeader(this, xscale);
+	m_tempoHeader->setOrigin(-offset, 0);
 
 	m_headerTabs->addTab(&virtualScroll, QString(tr("Navigator")));
 	m_headerTabs->addTab(m_tempoHeader, QString(tr("Tempo")));
@@ -529,7 +530,7 @@ void Composer::posChanged(int idx, unsigned val, bool)
 	cursVal = val;
 	m_timeHeader->setTime(val);
 	time->setPos(3, val, false);
-	m_sigRuler->setPos(3, val, false);
+	//m_sigRuler->setPos(3, val, false);
 }
 
 void Composer::heartBeat()
@@ -670,16 +671,17 @@ void Composer::composerViewChanged()
 void Composer::updateAll()
 {
 	unsigned endTick = song->len();
-	//int offset = AL::sigmap.ticksMeasure(endTick);
+	int offset = AL::sigmap.ticksMeasure(endTick);
 	/*hscroll->setRange(-offset, endTick + offset); //DEBUG
 	canvas->setOrigin(-offset, 0);
 	time->setOrigin(-offset, 0);*/
 
-	int offset = -(config.division / 4);
+	//int offset = -(config.division / 4);
 	hscroll->setRange(offset, endTick + offset); //DEBUG
-	canvas->setOrigin(offset, 0);
-	time->setOrigin(offset, 0);
-	m_sigRuler->setOrigin(offset, 0);
+	canvas->setOrigin(-offset, 0);
+	time->setOrigin(-offset, 0);
+	m_sigRuler->setOrigin(-offset, 0);
+	m_tempoHeader->setOrigin(-offset, 0);
 
 	int bar, beat;
 	unsigned tick;

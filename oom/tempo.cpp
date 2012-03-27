@@ -108,7 +108,8 @@ int TempoList::tempo(unsigned tick) const
 		ciTEvent i = upper_bound(tick);
 		if (i == end())
 		{
-			printf("no TEMPO at tick %d,0x%x\n", tick, tick);
+			if(debugMsg)
+				printf("no TEMPO at tick %d,0x%x\n", tick, tick);
 			return 1000;
 		}
 		return i->second->tempo;
@@ -127,7 +128,8 @@ void TempoList::del(unsigned tick)
 	iTEvent e = find(tick);
 	if (e == end())
 	{
-		printf("TempoList::del(%d): not found\n", tick);
+		if(debugMsg)
+			printf("TempoList::del(%d): not found\n", tick);
 		return;
 	}
 	del(e);
@@ -140,7 +142,8 @@ void TempoList::del(iTEvent e)
 	++ne;
 	if (ne == end())
 	{
-		printf("TempoList::del() HALLO\n");
+		if(debugMsg)
+			printf("TempoList::del() HALLO\n");
 		return;
 	}
 	ne->second->tempo = e->second->tempo;
@@ -208,6 +211,26 @@ void TempoList::delTempo(unsigned tick)
 	++_tempoSN;
 }
 
+void TempoList::delTempoRange(unsigned start, unsigned end)
+{
+	if(start == end)
+		del(start);
+	else
+	{
+		if(start > end)
+		{	
+			int tmp = end;
+			end = start;
+			start = tmp;
+		}
+		while(start < end)
+		{
+			del(start);
+			++start;
+		}
+	}
+}
+
 //---------------------------------------------------------
 //   changeTempo
 //---------------------------------------------------------
@@ -254,7 +277,8 @@ unsigned TempoList::tick2frame(unsigned tick, int* sn) const
 		ciTEvent i = upper_bound(tick);
 		if (i == end())
 		{
-			printf("tick2frame(%d,0x%x): not found\n", tick, tick);
+			if(debugMsg)
+				printf("tick2frame(%d,0x%x): not found\n", tick, tick);
 			// abort();
 			return 0;
 		}
@@ -327,7 +351,8 @@ unsigned TempoList::deltaTick2frame(unsigned tick1, unsigned tick2, int* sn) con
 		ciTEvent i = upper_bound(tick1);
 		if (i == end())
 		{
-			printf("TempoList::deltaTick2frame: tick1:%d not found\n", tick1);
+			if(debugMsg)
+				printf("TempoList::deltaTick2frame: tick1:%d not found\n", tick1);
 			// abort();
 			return 0;
 		}

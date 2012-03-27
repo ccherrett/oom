@@ -84,3 +84,9 @@ void TempoHeader::setEndTempo(double tempo)
 			m_canvas->setEndTempo(int(60000000.0 / tempo));
 	}
 }
+
+void TempoHeader::setOrigin(int x, int y)
+{
+	if(m_canvas)
+		m_canvas->setOrigin(x, y);
+}

@@ -232,7 +232,7 @@ void TempoCanvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		QPen mypen = QPen(QColor(config.partColors[pcolor]), 2, Qt::SolidLine);
 		p.setPen(mypen);
 		p.drawLine(line1x, mapy(line1y), line2x, mapy(line2y));
-		if(m_drawToolTip)
+		/*if(m_drawToolTip)
 		{
 			int tempo = computeTempo(lastPos.y(), (height() - 1));
 			tempo = int(60000000.0 / tempo);
@@ -242,13 +242,14 @@ void TempoCanvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 			p.setPen(QColor(255,255,255,190));
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 
-			QPoint cursorPos = QCursor::pos();
-			QToolTip::showText(cursorPos, tempoStr, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
+			//QPoint cursorPos = QCursor::pos();
+			//QToolTip::showText(cursorPos, tempoStr, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
 			//p.drawText(QRect(lastPos.x() + 10, mapy(lastPos.y()) - 6, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
-			//p.drawText(lastPos.x(), mapy(lastPos.y()), tempoStr);
-		}
+			p.drawText(QRect(10, 0, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
+			//p.drawText(0, 0, tempoStr);
+		}*/
 	}
-	else if(m_drawToolTip)
+	/*else if(m_drawToolTip)
 	{
 		int tempo = computeTempo(lastPos.y(), (height() - 1));
 		tempo = int(60000000.0 / tempo);
@@ -258,13 +259,36 @@ void TempoCanvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		p.setPen(QColor(255,255,255,190));
 		p.setFont(QFont("fixed-width", 8, QFont::Bold));
 
-		QPoint cursorPos = QCursor::pos();
-		QToolTip::showText(cursorPos, tempoStr, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
+		//QPoint cursorPos = QCursor::pos();
+		//QToolTip::showText(cursorPos, tempoStr, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
 		//p.drawText(QRect(lastPos.x() + 10, mapy(lastPos.y()) - 6, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
-		//p.drawText(lastPos.x(), mapy(lastPos.y()), tempoStr);
-	}
+		p.drawText(QRect(10, 0, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
+		//p.drawText(0, 0, tempoStr);
+	}*/
 }/*}}}*/
 
+void TempoCanvas::drawOverlay(QPainter& p, const QRect&)/*{{{*/
+{
+	if(m_drawToolTip)
+	{
+		int tempo = computeTempo(lastPos.y(), (height() - 1));
+		tempo = int(60000000.0 / tempo);
+		QString tempoStr = QString::number(double(tempo));
+
+		QColor textColor = QColor(255,255,255,190);
+		//QColor textColor = QColor(0,0,0,180);
+		p.setRenderHint(QPainter::Antialiasing, false);
+		p.setPen(textColor);
+		p.setFont(QFont("fixed-width", 8, QFont::Bold));
+
+		QFontMetrics fm(config.fonts[3]);
+		int y = fm.lineSpacing() + 2;
+		p.drawText(2, y, tempoStr);
+	}
+	
+	
+
+}/*}}}*/
 //---------------------------------------------------------
 //   viewMousePressEvent
 //---------------------------------------------------------
@@ -465,21 +489,32 @@ bool TempoCanvas::deleteVal1(unsigned int x1, unsigned int x2)
 	bool songChanged = false;
 
 	TempoList* tl = &tempomap;
+	QList<void*> delList;
 	for (iTEvent i = tl->begin(); i != tl->end(); ++i)
 	{
 		if (i->first < x1)
 			continue;
-		if (i->first >= x2)
+		if (i->first > x2)
 			break;
+		songChanged = true;
 		iTEvent ii = i;
 		++ii;
 		if (ii != tl->end())
 		{
-			int tempo = ii->second->tempo;
-			audio->msgDeleteTempo(i->first, tempo, false);
+			delList.append(ii->second);
+			//int tempo = ii->second->tempo;
+			//audio->msgDeleteTempo(i->first, tempo, false);
 			songChanged = true;
 		}
 	}
+
+	if(songChanged)
+		audio->msgDeleteTempoRange(delList, false);
+	/*foreach(TEvent* ev, delList)
+	{
+		audio->msgDeleteTempo(ev->tick, ev->tempo, false);
+		songChanged = true;
+	}*/
 	return songChanged;
 }
 
@@ -535,6 +570,9 @@ void TempoCanvas::newVal(int x1, int x2, int y)
 		xx2 = xx1;
 		xx1 = tmp;
 	}
+	int raster = oom->raster();
+	if (raster == 1 || raster == 0) // set reasonable raster
+		raster = config.division / 4;
 	deleteVal1(xx1, xx2);
 	int wh = (height() - 1);
 	if(y < 0)
@@ -545,7 +583,17 @@ void TempoCanvas::newVal(int x1, int x2, int y)
 	//yp = (60000000000.0 / yp);
 	//audio->msgAddTempo(xx1, int(60000000000.0 / (280000 - y)), false);
 	//qDebug("TempoCanvas::newVal: y: %d, tempo: %d", y, yp);
-	audio->msgAddTempo(xx1, yp, false);
+	if(xx1 == xx2)
+	{
+		audio->msgAddTempo(xx1, yp, false);
+	}
+	else
+	{
+		for (int x = xx1; x < xx2; x += raster)
+		{
+			audio->msgAddTempo(x, yp, false);
+		}
+	}
 	redraw();
 }
 

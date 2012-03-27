@@ -2401,6 +2401,24 @@ void Song::processMsg(AudioMsg* msg)
 			updateFlags = SC_TEMPO;
 			break;
 
+		case SEQM_REMOVE_TEMPO_RANGE:
+		{
+			//printf("processMsg (SEQM_REMOVE_TEMPO) UndoOp::DeleteTempo. adding tempo at: %d with tempo=%d\n", msg->a, msg->b);
+			QList<void*> list = msg->objectList;
+			if(!list.isEmpty())
+			{
+				TEvent* se = (TEvent*)list.front();
+				TEvent* ee = (TEvent*)list.back();
+				for(int i = 0; i < list.size(); i++)
+				{
+					TEvent* ev = (TEvent*)list.at(i);
+					undoOp(UndoOp::DeleteTempo, ev->tick, ev->tempo);
+				}
+				tempomap.delTempoRange(se->tick, ee->tick);
+				updateFlags = SC_TEMPO;
+			}
+			break;
+		}
 		case SEQM_ADD_SIG:
 			undoOp(UndoOp::AddSig, msg->a, msg->b, msg->c);
 			AL::sigmap.add(msg->a, AL::TimeSignature(msg->b, msg->c));

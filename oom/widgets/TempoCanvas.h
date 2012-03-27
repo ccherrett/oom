@@ -64,6 +64,7 @@ protected:
     //virtual void mouseReleaseEvent(QMouseEvent* event);
     virtual void leaveEvent(QEvent*e);
 	virtual void enterEvent(QEvent*);
+    virtual void drawOverlay(QPainter&, const QRect&);
 
 signals:
     void followEvent(int);

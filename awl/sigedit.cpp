@@ -18,11 +18,11 @@
 //  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //=============================================================================
 
+#include "globals.h"
 #include "al/al.h"
 #include "awl.h"
 #include "sigedit.h"
 #include "al/sig.h"
-//#include "sig.h"
 
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -169,7 +169,8 @@ namespace Awl {
 
 	void SigEdit::fixup(QString& input) const
 	{
-		printf("fixup <%s>\n", input.toLatin1().constData());
+		if(debugMsg)
+			printf("fixup <%s>\n", input.toLatin1().constData());
 	}
 
 	//---------------------------------------------------------
