@@ -1697,6 +1697,12 @@ void Performer::setTime(unsigned tick)/*{{{*/
 	time->setPos(3, tick, false);
     pcbar->setPos(3, tick, false);
 	m_sigRuler->setPos(3, tick, false);
+	canvas->setPos(3, tick, false);
+	foreach(CtrlEdit* ctrl, ctrlEditList)
+	{
+		if(ctrl)
+			ctrl->setPos(3, tick, false);
+	}
 }/*}}}*/
 
 void Performer::setTimeFromSig(unsigned tick)/*{{{*/
@@ -1705,7 +1711,12 @@ void Performer::setTimeFromSig(unsigned tick)/*{{{*/
 		posLabel->setValue(tick);
 	time->setPos(3, tick, false);
     pcbar->setPos(3, tick, false);
-	//m_sigRuler->setPos(3, tick, false);
+	canvas->setPos(3, tick, false);
+	foreach(CtrlEdit* ctrl, ctrlEditList)
+	{
+		if(ctrl)
+			ctrl->setPos(3, tick, false);
+	}
 }/*}}}*/
 
 //---------------------------------------------------------

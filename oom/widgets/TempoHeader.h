@@ -31,6 +31,7 @@ public slots:
 	void setStartTempo(double);
 	void setEndTempo(double);
     void setOrigin(int x, int y);
+    void setPos(int idx, unsigned x, bool adjustScrollbar);
 
 signals:
     void updateXMag(float);

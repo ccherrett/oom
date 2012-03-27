@@ -69,6 +69,10 @@ public slots:
 	{
 		canvas->update();
 	}
+    void setPos(int idx, unsigned x, bool adjustScrollbar)
+	{
+		canvas->setPos(idx, x, adjustScrollbar);
+	}
 	void setMinHeight(int);
 	void setMaxHeight(int);
 	void updateHeight(int);

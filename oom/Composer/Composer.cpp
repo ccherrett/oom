@@ -531,6 +531,8 @@ void Composer::posChanged(int idx, unsigned val, bool)
 	cursVal = val;
 	m_timeHeader->setTime(val);
 	time->setPos(3, val, false);
+	canvas->setPos(3, val, false);
+	m_tempoHeader->setPos(3, val, false);
 	//m_sigRuler->setPos(3, val, false);
 }
 
@@ -585,27 +587,31 @@ void Composer::currentTabChanged(int tab)
 
 void Composer::setTime(unsigned tick)/*{{{*/
 {
-	if (tick == MAXINT)
+	/*if (tick == MAXINT)
 		return;
 	else
-	{
+	{*/
 		cursVal = tick;
 		m_timeHeader->setTime(tick);
 		time->setPos(3, tick, false);
 		m_sigRuler->setPos(3, tick, false);
-	}
+		canvas->setPos(3, tick, false);
+		m_tempoHeader->setPos(3, tick, false);
+	//}
 }/*}}}*/
 
 void Composer::setTimeFromSig(unsigned tick)/*{{{*/
 {
-	if (tick == MAXINT)
-		return;
-	else
-	{
+	//if (tick == MAXINT)
+	//	return;
+	//else
+	//{
 		cursVal = tick;
 		m_timeHeader->setTime(tick);
 		time->setPos(3, tick, false);
-	}
+		canvas->setPos(3, tick, false);
+		m_tempoHeader->setPos(3, tick, false);
+	//}
 }/*}}}*/
 
 //---------------------------------------------------------

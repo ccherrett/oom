@@ -1834,7 +1834,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 	}
 	else if (key == shortcuts[SHRT_POS_DEC].key)
 	{
-                int spos = _pos[0];
+        int spos = _pos[0];
 		if (spos > 0)
 		{
 			spos -= 1; // Nudge by -1, then snap down with raster1.

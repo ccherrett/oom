@@ -546,9 +546,10 @@ void Audio::process1(unsigned samplePos, unsigned offset, unsigned frames)
 	int channels;
 	for (ciTrack it = tl->begin(); it != tl->end(); ++it)
 	{
-		if ((*it)->isMidiTrack())
+		Track* t = *it;
+		if (!t || t->isMidiTrack())
 			continue;
-		track = (AudioTrack*) (*it);
+		track = (AudioTrack*) t;
 
 		// For audio track types, synths etc. which need some kind of non-audio
 		//  (but possibly audio-affecting) processing always, even if their output path
@@ -578,9 +579,10 @@ void Audio::process1(unsigned samplePos, unsigned offset, unsigned frames)
 	//  processing is 'turned on', if there was a backlog of events while it was off, then they all happen at once.
 	for (ciTrack it = tl->begin(); it != tl->end(); ++it)
 	{
-		if ((*it)->isMidiTrack())
+		Track* t = *it;
+		if (!t || t->isMidiTrack())
 			continue;
-		track = (AudioTrack*) (*it);
+		track = (AudioTrack*) t;
 		// Ignore unprocessed tracks which have an output route, because they will be processed by
 		//  whatever track(s) they are routed to.
 		if (!track->processed() && track->noOutRoute() && (track->type() != Track::AUDIO_OUTPUT))

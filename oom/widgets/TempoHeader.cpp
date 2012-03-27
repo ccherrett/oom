@@ -90,3 +90,10 @@ void TempoHeader::setOrigin(int x, int y)
 	if(m_canvas)
 		m_canvas->setOrigin(x, y);
 }
+
+void TempoHeader::setPos(int idx, unsigned x, bool sb)
+{
+	if(m_canvas)
+		m_canvas->setPos(idx, x, sb);
+}
+

@@ -190,13 +190,7 @@ void TempoCanvas::pdraw(QPainter& p, const QRect& rect)/*{{{*/
 	//    draw marker
 	//---------------------------------------------------
 
-	int xp = mapx(pos[0]);
-	if (xp >= x && xp < x + w)
-	{
-		p.setPen(QColor(0, 186, 255));
-		p.drawLine(xp, y, xp, y + h);
-	}
-	xp = mapx(pos[1]);
+	int xp = mapx(pos[1]);
 	if (xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
@@ -206,6 +200,21 @@ void TempoCanvas::pdraw(QPainter& p, const QRect& rect)/*{{{*/
 	if (xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
+		p.drawLine(xp, y, xp, y + h);
+	}
+
+	xp = mapx(pos[3]);
+	if (pos[3] != MAXINT)
+	{
+		p.setPen(QColor(156,75,219));
+		if (xp >= x && xp < x + w)
+			p.drawLine(xp, y, xp, y+h);
+	}
+
+	xp = mapx(pos[0]);
+	if (xp >= x && xp < x + w)
+	{
+		p.setPen(QColor(0, 186, 255));
 		p.drawLine(xp, y, xp, y + h);
 	}
 }/*}}}*/

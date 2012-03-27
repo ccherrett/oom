@@ -1,11 +1,12 @@
 //=========================================================
-//  OOMidi
+//  OOStudio
 //  OpenOctave Midi and Audio Editor
-//    $Id: canvas.cpp,v 1.10.2.17 2009/05/03 04:14:01 terminator356 Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 - 2012 Andrew Williams and Christopher Cherrett
 //=========================================================
 
 #include <stdio.h>
+#include <values.h>
 
 #include "canvas.h"
 
@@ -428,11 +429,15 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		if(_drawPartEndLine)
 			p.drawLine(_curPart->endTick(), y, _curPart->endTick(), y2);
 	}
-	//QPen playbackPen(QColor(8,193,156), 1);
-	//p.setPen(playbackPen);
-	//p.setPen(Qt::green);
-	p.setPen(QColor(0, 186, 255));
 
+	p.setPen(QColor(156,75,219));
+	if (_pos[3] != MAXINT)
+	{
+		if (_pos[3] >= unsigned(x) && _pos[3] < unsigned(x2))
+			p.drawLine(_pos[3], y, _pos[3], y2);
+	}
+
+	p.setPen(QColor(0, 186, 255));
     if (_pos[0] >= unsigned(x) && _pos[0] < unsigned(x2))
 	{
     	p.drawLine(_pos[0], y, _pos[0], y2);
@@ -1304,6 +1309,8 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 		break;
 	}
 
+	_pos[3] = _evPos.x();
+	redraw();
 	mouseMove(event);
 }/*}}}*/
 

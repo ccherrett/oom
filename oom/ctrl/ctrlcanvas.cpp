@@ -237,7 +237,7 @@ void CtrlCanvas::setPos(int idx, unsigned val, bool adjustScrollbar)/*{{{*/
 		w += npos - opos;
 		x = opos;
 	}
-        pos[idx] = val;
+    pos[idx] = val;
 
         // FIXME: redrawing this rectangle wipes out the controller lane
         // items when cursor passes over them.
@@ -1409,13 +1409,7 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)/*{{{*/
 	//    draw marker
 	//---------------------------------------------------
 
-	int xp = mapx(pos[0]);
-	if (xp >= x && xp < x + w)
-	{
-		p.setPen(QColor(0, 186, 255));
-		p.drawLine(xp, y, xp, y + h);
-	}
-	xp = mapx(pos[1]);
+	int xp = mapx(pos[1]);
 	if ((song->loop() || song->punchin()) && xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
@@ -1425,6 +1419,21 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)/*{{{*/
 	if ((song->loop() || song->punchout()) && xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
+		p.drawLine(xp, y, xp, y + h);
+	}
+
+	p.setPen(QColor(156,75,219));
+	xp = mapx(pos[3]);
+	if (pos[3] != MAXINT)
+	{
+		if (xp >= x && xp < x + w)
+			p.drawLine(xp, y, xp, y+h);
+	}
+
+	xp = mapx(pos[0]);
+	if (xp >= x && xp < x + w)
+	{
+		p.setPen(QColor(0, 186, 255));
 		p.drawLine(xp, y, xp, y + h);
 	}
 
