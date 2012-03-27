@@ -24,8 +24,8 @@ MTScale::MTScale(int* r, QWidget* parent, int xs, bool _mode)
 : View(parent, xs, 1)
 {
 	waveMode = _mode;
-	setToolTip(tr("bar scale"));
-	barLocator = false;
+	//setToolTip(tr("bar scale"));
+	barLocator = true;
 	raster = r;
 	if (waveMode)
 	{
@@ -219,7 +219,6 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 	int x = r.x();
 	int w = r.width();
 
-	// Added by Tim. p3.3.6
 	//printf("MTScale::pdraw x:%d w:%d\n", x, w);
 
 	x -= 20;
@@ -230,9 +229,7 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 	//---------------------------------------------------
 
 	int y = 12;
-	//p.setPen(QColor(255,255,255));
 	p.setPen(colTimeLine);
-	//p.setFont(config.fonts[4]);
 	p.setFont(QFont("fixed-width", 9, QFont::Bold));
 	p.drawLine(r.x(), y + 1, r.x() + r.width(), y + 1);
 	QRect tr(r);
@@ -261,22 +258,16 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 		}
 
 		QRect tr(xp, 0, xe - xp, 13);
-		//if (m->second.current())
-		//      p.fillRect(tr, white);
 
 		QRect wr = r.intersect(tr);
-		//if (r.intersects(tr))
 		if (!wr.isEmpty())
 		{
 			if (m->second.current())
 			{
-				//p.fillRect(tr, white);
 				p.fillRect(wr, QColor(89, 89, 102));
 			}
 
 			int x2;
-			//iMarker mm = m;
-			//++mm;
 			if (mm != marker->end())
 			{
 				if (waveMode)
@@ -303,62 +294,17 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 			if (xp >= -1023)
 			{
 				QRect r = QRect(xp + 10, 0, x2 - xp, 12);
-				//p.setPen(QColor(220,222,223));
-				//p.setPen(QColor(255,255,255));
 				p.setPen(colTimeLine);
 				p.drawText(r, Qt::AlignLeft | Qt::AlignVCenter, m->second.name());
 			}
 
 			if (xp >= 0)
 			{
-				//p.setPen(QColor(243, 191, 124));
 				p.setPen(colTimeLine);
 				p.drawLine(xp, y, xp, height());
 			}
 		}
 	}
-	/*
-		  //---------------------------------------------------
-		  //    draw location marker
-		  //---------------------------------------------------
-
-		  int h = height()-12;
-
-		  if (barLocator)
-		  {
-				p.setPen(Qt::red);
-				int xp = mapx(pos[0]);
-				if (xp >= x && xp < x+w)
-					  p.drawLine(xp, y, xp, h);
-				p.setPen(Qt::blue);
-				xp = mapx(pos[1]);
-				if (xp >= x && xp < x+w)
-					  p.drawLine(xp, y, xp, h);
-				xp = mapx(pos[2]);
-				if (xp >= x && xp < x+w)
-					  p.drawLine(xp, y, xp, h);
-		  }
-		  else
-		  {
-				for (int i = 0; i < 3; ++i)
-				{
-					  int xp = mapx(pos[i]);
-					  if (xp >= x && xp < x+w)
-					  {
-							QPixmap* pm = markIcon[i];
-							p.drawPixmap(xp - pm->width()/2, y-1, *pm);
-					  }
-				}
-		  }
-		  //p.setPen(QColor(220,222,223));
-		  p.setPen(colTimeLine);
-		  if (pos[3] != MAXINT)
-		  {
-				int xp = mapx(pos[3]);
-				if (xp >= x && xp < x+w)
-					  p.drawLine(xp, 0, xp, height());
-		  }
-	 */
 	unsigned ctick;
 	int bar1, bar2, beat;
 	unsigned tick;
@@ -412,12 +358,10 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 				n = 32;
 			if (bar % n)
 				continue;
-			//p.setFont(config.fonts[3]);
 			int x = mapx(waveMode ? b : stick);
 			QString s;
 			s.setNum(bar + 1);
 			p.drawLine(x, y + 1, x, y + 1 + h);
-			//                  QRect r = QRect(x+2, y, 0, h);
 			QRect r = QRect(x + 2, y, 1000, h);
 			p.setFont(QFont("fixed-width", 9, QFont::Bold));
 			p.drawText(r, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip, s);
@@ -440,14 +384,12 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 				{
 					num = bar + 1;
 					y1 = y + 1;
-					//p.setFont(config.fonts[3]);
 					p.setFont(QFont("fixed-width", 9, QFont::Bold));
 				}
 				else
 				{
 					num = beat + 1;
 					y1 = y + 7;
-					//p.setFont(config.fonts[1]);
 					p.setFont(QFont("fixed-width", 7, QFont::Normal));
 					r.setY(y + 3);
 				}
@@ -475,17 +417,17 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 	p.setPen(colTimeLine);
 	if (barLocator)
 	{
-		p.setPen(Qt::red);
+		p.setPen(QColor(0, 186, 255));
 		int xp = mapx(pos[0]);
 		if (xp >= x && xp < x + w)
-			p.drawLine(xp, y, xp, h);
-		p.setPen(Qt::blue);
+			p.drawLine(xp, 0, xp, height());
+		p.setPen(QColor(139, 225, 69));
 		xp = mapx(pos[1]);
 		if (xp >= x && xp < x + w)
-			p.drawLine(xp, y, xp, h);
+			p.drawLine(xp, 0, xp, height());
 		xp = mapx(pos[2]);
 		if (xp >= x && xp < x + w)
-			p.drawLine(xp, y, xp, h);
+			p.drawLine(xp, 0, xp, height());
 	}
 	else
 	{

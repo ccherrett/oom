@@ -39,6 +39,7 @@ class EditInstrument : public QMainWindow, public Ui::EditInstrumentBase
 	DoubleLabel* m_panLabel;
 	Knob* m_auxKnob;
 	DoubleLabel* m_auxLabel;
+	bool m_loading;
 
 	void closeEvent(QCloseEvent*);
 	int checkDirty(MidiInstrument*, bool isClose = false);

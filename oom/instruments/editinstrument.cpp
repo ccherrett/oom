@@ -43,6 +43,7 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 : QMainWindow(parent, fl)
 {
 	setupUi(this);
+	m_loading = false;
 	fileNewAction->setIcon(QIcon(*filenewIcon));
 	fileOpenAction->setIcon(QIcon(*openIcon));
 	fileSaveAction->setIcon(QIcon(*saveIcon));
@@ -216,6 +217,8 @@ void EditInstrument::btnImportClicked(bool)
 
 void EditInstrument::autoLoadChecked(bool)
 {
+	if(m_loading)
+		return;
 	QListWidgetItem* item = instrumentList->currentItem();
 	if(item)
 	{
@@ -226,6 +229,8 @@ void EditInstrument::autoLoadChecked(bool)
 
 void EditInstrument::panChanged(double val)
 {
+	if(m_loading)
+		return;
 	QListWidgetItem* item = instrumentList->currentItem();
 	if(item)
 	{
@@ -236,6 +241,8 @@ void EditInstrument::panChanged(double val)
 
 void EditInstrument::auxChanged(double val)
 {
+	if(m_loading)
+		return;
 	QListWidgetItem* item = instrumentList->currentItem();
 	if(item)
 	{
@@ -854,6 +861,7 @@ void EditInstrument::changeInstrument()/*{{{*/
 
 	if (!sel)
 		return;
+	m_loading = true;
 
 	oldMidiInstrument = sel;
 
@@ -866,15 +874,15 @@ void EditInstrument::changeInstrument()/*{{{*/
 	chkAutoload->setChecked(workingInstrument.isOOMInstrument());
 	chkAutoload->blockSignals(false);
 
-	m_panKnob->blockSignals(true);
+	//m_panKnob->blockSignals(true);
 	m_panKnob->setValue(workingInstrument.defaultPan());
 	m_panLabel->setValue(workingInstrument.defaultPan());
-	m_panKnob->blockSignals(false);
+	//m_panKnob->blockSignals(false);
 
-	m_auxKnob->blockSignals(true);
+	//m_auxKnob->blockSignals(true);
 	m_auxKnob->setValue(workingInstrument.defaultVerb());
 	m_auxLabel->setValue(workingInstrument.defaultVerb());
-	m_auxKnob->blockSignals(false);
+	//m_auxKnob->blockSignals(false);
 
 	// populate patch list
 	patchView->blockSignals(true);
@@ -976,6 +984,7 @@ void EditInstrument::changeInstrument()/*{{{*/
 	}
 
 	controllerChanged();
+	m_loading = false;
 }/*}}}*/
 
 //---------------------------------------------------------

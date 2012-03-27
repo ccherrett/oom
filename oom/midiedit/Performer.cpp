@@ -18,6 +18,7 @@
 #include "xml.h"
 #include "mtscale.h"
 #include "pcscale.h"
+#include "sigscale.h"
 #include "PerformerCanvas.h"
 #include "Performer.h"
 #include "poslabel.h"
@@ -325,6 +326,8 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//This may well be a copy of MTScale extended for our needs
 	pcbar = new PCScale(&_raster, this, this, xscale);
 	time = new MTScale(&_raster, this, xscale);
+	m_sigRuler = new SigScale(&_raster, this, xscale);
+
 	piano = new Piano(this, yscale, this);
     piano->setFixedWidth(pianoWidth);
     canvas = new PerformerCanvas(this, this, xscale, yscale);
@@ -343,6 +346,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     time->setOrigin(offset, 0);
     pcbar->setOrigin(offset, 0);
+	m_sigRuler->setOrigin(offset, 0);
 
 	canvasFrameBox->addWidget(piano, 0);
 	canvasFrameBox->addWidget(canvas, 1);
@@ -431,6 +435,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	rulerLane->addWidget(pcbar, 0);
 	rulerLane->addWidget(time, 0);
+	rulerLane->addWidget(m_sigRuler, 0);
 	rulerLane->addWidget(hLine(this), 0);
 	
 	m_layout->addLayout(topBox, 0);
@@ -456,10 +461,12 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
     connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
     connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), m_sigRuler, SLOT(setXPos(int)));
 
     connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
     connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
     connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), m_sigRuler, SLOT(setXMag(float)));
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
 
     //connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
@@ -515,6 +522,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
     connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
     connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+    connect(m_sigRuler, SIGNAL(timeChanged(unsigned)), SLOT(setTimeFromSig(unsigned)));
     connect(pcbar, SIGNAL(addProgramChange(Part*, unsigned)), midiConductor, SLOT(insertMatrixEvent(Part*, unsigned)));
     connect(canvas, SIGNAL(partChanged(Part*)), midiConductor, SLOT(editorPartChanged(Part*)));
     connect(m_soloAction, SIGNAL(triggered(bool)), SLOT(soloChanged(bool)));
@@ -1688,6 +1696,16 @@ void Performer::setTime(unsigned tick)/*{{{*/
 		posLabel->setValue(tick);
 	time->setPos(3, tick, false);
     pcbar->setPos(3, tick, false);
+	m_sigRuler->setPos(3, tick, false);
+}/*}}}*/
+
+void Performer::setTimeFromSig(unsigned tick)/*{{{*/
+{
+	if (tick != MAXINT)
+		posLabel->setValue(tick);
+	time->setPos(3, tick, false);
+    pcbar->setPos(3, tick, false);
+	//m_sigRuler->setPos(3, tick, false);
 }/*}}}*/
 
 //---------------------------------------------------------

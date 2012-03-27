@@ -32,6 +32,7 @@ class QLabel;
 class PerformerCanvas;
 class MTScale;
 class PCScale;
+class SigScale;
 class Track;
 class QToolButton;
 class QToolBar;
@@ -77,6 +78,7 @@ class Performer : public AbstractMidiEditor
     Conductor *midiConductor;
     Track* selected;
     PCScale* pcbar;
+	SigScale* m_sigRuler;
 	Piano* piano;
 
 	QSignalMapper* mapper;
@@ -250,6 +252,7 @@ private slots:
     void selectionChanged(); // enable/disable "Copy" & "Paste"
     void setSpeaker(bool);
     void setTime(unsigned);
+    void setTimeFromSig(unsigned);
     void follow(int pos);
     void songChanged1(int);
     void configChanged();

@@ -15,6 +15,7 @@
 #include "AbstractMidiEditor.h"
 #include "sigscale.h"
 #include "song.h"
+#include "icons.h"
 #include "gconfig.h"
 
 //---------------------------------------------------------
@@ -43,7 +44,10 @@ SigScale::SigScale(int* r, QWidget* parent, int xs)
 void SigScale::setPos(int idx, unsigned val, bool)
 {
 	if (val == pos[idx])
+	{
+		redraw();
 		return;
+	}
 	unsigned opos = mapx(pos[idx]);
 	pos[idx] = val;
 	if (!isVisible())
@@ -61,7 +65,8 @@ void SigScale::setPos(int idx, unsigned val, bool)
 		w += val - opos;
 		x += opos;
 	}
-	redraw(QRect(x, 0, w, height()));
+	redraw();
+	//redraw(QRect(x, 0, w, height()));
 }
 
 void SigScale::viewMousePressEvent(QMouseEvent* event)
@@ -84,16 +89,20 @@ void SigScale::viewMouseMoveEvent(QMouseEvent* event)
 	{
 		case Qt::LeftButton:
 			i = 0;
+			pos[0] = x;
 			break;
 		case Qt::MidButton:
 			i = 1;
+			pos[1] = x;
 			break;
 		case Qt::RightButton:
 			i = 2;
+			pos[2] = x;
 			break;
 		default:
-			i = 3;
-			break;
+			pos[3] = x;
+			redraw();
+			return;
 	}
 	Pos p(x, true);
 	song->setPos(i, p);
@@ -106,7 +115,7 @@ void SigScale::viewMouseMoveEvent(QMouseEvent* event)
 
 void SigScale::leaveEvent(QEvent*)
 {
-	//      emit timeChanged(MAXINT);
+	emit timeChanged(MAXINT);
 }
 
 //---------------------------------------------------------
@@ -124,11 +133,8 @@ void SigScale::pdraw(QPainter& p, const QRect& r)
 	QColor colTimeLine = QColor(172,181,176);
 	p.setPen(colTimeLine);
 	p.setFont(QFont("fixed-width", 9, QFont::Bold));
-	//p.setFont(config.fonts[3]);
-	///for (ciSigEvent si = sigmap.begin(); si != sigmap.end(); ++si) {
 	for (AL::ciSigEvent si = AL::sigmap.begin(); si != AL::sigmap.end(); ++si)
 	{
-		///SigEvent* e = si->second;
 		AL::SigEvent* e = si->second;
 		int xp = mapx(e->tick);
 		if (xp > x + w)
@@ -156,7 +162,21 @@ void SigScale::pdraw(QPainter& p, const QRect& r)
 			p.drawLine(xp, 0, xp, height());
 	}
 
-	//p.setPen(Qt::red);
+	QList<QColor> colors;
+	colors << QColor(0, 186, 255) << QColor(139, 225, 69) << QColor(139, 225, 69);
+	//colors << QColor(139, 225, 69) << QColor(139, 225, 69) << QColor(0, 186, 255);
+	for (int i = 0; i < 3; ++i)
+	{
+		int xp = mapx(pos[i]);
+		if (xp >= x && xp < x + w)
+		{
+			p.setPen(colors.at(i));
+			p.drawLine(xp, 0, xp, 8);
+			QPixmap* pm = markIcon[i];
+			p.drawPixmap(xp - pm->width() / 2, 1, *pm);
+		}
+	}
+	/*//p.setPen(Qt::red);
 	p.setPen(QColor(0, 186, 255));
 	int xp = mapx(pos[0]);
 	if (xp >= x && xp < x + w)
@@ -168,7 +188,7 @@ void SigScale::pdraw(QPainter& p, const QRect& r)
 		p.drawLine(xp, 0, xp, h);
 	xp = mapx(pos[2]);
 	if (xp >= x && xp < x + w)
-		p.drawLine(xp, 0, xp, h);
+		p.drawLine(xp, 0, xp, h);*/
 }
 
 

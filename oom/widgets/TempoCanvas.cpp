@@ -132,6 +132,7 @@ void TempoCanvas::setPos(int idx, unsigned val, bool adjustScrollbar)/*{{{*/
 void TempoCanvas::leaveEvent(QEvent*)
 {
 	m_drawToolTip = false;
+	redraw();
 	emit tempoChanged(-1);
 	emit timeChanged(MAXINT);
 }
@@ -232,39 +233,7 @@ void TempoCanvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		QPen mypen = QPen(QColor(config.partColors[pcolor]), 2, Qt::SolidLine);
 		p.setPen(mypen);
 		p.drawLine(line1x, mapy(line1y), line2x, mapy(line2y));
-		/*if(m_drawToolTip)
-		{
-			int tempo = computeTempo(lastPos.y(), (height() - 1));
-			tempo = int(60000000.0 / tempo);
-			QString tempoStr = QString::number(double(tempo));
-
-			p.setRenderHint(QPainter::Antialiasing, false);
-			p.setPen(QColor(255,255,255,190));
-			p.setFont(QFont("fixed-width", 8, QFont::Bold));
-
-			//QPoint cursorPos = QCursor::pos();
-			//QToolTip::showText(cursorPos, tempoStr, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
-			//p.drawText(QRect(lastPos.x() + 10, mapy(lastPos.y()) - 6, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
-			p.drawText(QRect(10, 0, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
-			//p.drawText(0, 0, tempoStr);
-		}*/
 	}
-	/*else if(m_drawToolTip)
-	{
-		int tempo = computeTempo(lastPos.y(), (height() - 1));
-		tempo = int(60000000.0 / tempo);
-		QString tempoStr = QString::number(double(tempo));
-
-		p.setRenderHint(QPainter::Antialiasing, false);
-		p.setPen(QColor(255,255,255,190));
-		p.setFont(QFont("fixed-width", 8, QFont::Bold));
-
-		//QPoint cursorPos = QCursor::pos();
-		//QToolTip::showText(cursorPos, tempoStr, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
-		//p.drawText(QRect(lastPos.x() + 10, mapy(lastPos.y()) - 6, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
-		p.drawText(QRect(10, 0, 200, 60), Qt::TextWordWrap|Qt::AlignLeft, tempoStr);
-		//p.drawText(0, 0, tempoStr);
-	}*/
 }/*}}}*/
 
 void TempoCanvas::drawOverlay(QPainter& p, const QRect&)/*{{{*/
@@ -275,19 +244,22 @@ void TempoCanvas::drawOverlay(QPainter& p, const QRect&)/*{{{*/
 		tempo = int(60000000.0 / tempo);
 		QString tempoStr = QString::number(double(tempo));
 
-		QColor textColor = QColor(255,255,255,190);
+		QColor textColor = config.partColors[1];//QColor(255,255,255,190);
 		//QColor textColor = QColor(0,0,0,180);
 		p.setRenderHint(QPainter::Antialiasing, false);
 		p.setPen(textColor);
 		p.setFont(QFont("fixed-width", 8, QFont::Bold));
 
-		QFontMetrics fm(config.fonts[3]);
-		int y = fm.lineSpacing() + 2;
-		p.drawText(2, y, tempoStr);
+		int y = lastPos.y();
+		int x = rmapx(lastPos.x());
+		if(y < 10)
+			y += 10;
+		if(y > (height() -6))
+			y -= 6;
+		if(x > (width() - 40))
+			x -= 60;
+		p.drawText(x + 20, y, tempoStr);
 	}
-	
-	
-
 }/*}}}*/
 //---------------------------------------------------------
 //   viewMousePressEvent
