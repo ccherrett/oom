@@ -174,7 +174,7 @@ protected:
     QRect lasso;
     QPoint start;
     Tool tool;
-    unsigned pos[3];
+    unsigned pos[4];
     int curDrumInstrument; //Used by the drum-editor to view velocity of only one key (one drum)
 
     void leaveEvent(QEvent*e);

@@ -21,8 +21,10 @@ class SigScale : public View
 {
     Q_OBJECT
     int* raster;
-    unsigned pos[3];
+    unsigned pos[4];
     int button;
+	bool m_startCursorMove;
+	bool m_movingCursor;
 
 signals:
     void posChanged(unsigned, unsigned);

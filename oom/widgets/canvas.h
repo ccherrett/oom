@@ -84,7 +84,7 @@ protected:
     QPoint _start;
     QPoint _end;
     Tool _tool;
-    unsigned _pos[3];
+    unsigned _pos[4];
 
     HScrollDir _hscrollDir;
     VScrollDir _vscrollDir;

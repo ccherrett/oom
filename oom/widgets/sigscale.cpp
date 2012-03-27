@@ -27,9 +27,12 @@ SigScale::SigScale(int* r, QWidget* parent, int xs)
 {
 	setToolTip(tr("Signature scale"));
 	raster = r;
+	m_startCursorMove = false;
+	m_movingCursor = false;
 	pos[0] = song->cpos();
 	pos[1] = song->lpos();
 	pos[2] = song->rpos();
+	pos[3] = MAXINT;
 	button = Qt::NoButton;
 	setMouseTracking(true);
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), this, SLOT(setPos(int, unsigned, bool)));
@@ -69,21 +72,13 @@ void SigScale::setPos(int idx, unsigned val, bool)
 	//redraw(QRect(x, 0, w, height()));
 }
 
-void SigScale::viewMousePressEvent(QMouseEvent* event)
+void SigScale::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 {
 	button = event->button();
-	viewMouseMoveEvent(event);
-}
-
-void SigScale::viewMouseReleaseEvent(QMouseEvent*)
-{
-	button = Qt::NoButton;
-}
-
-void SigScale::viewMouseMoveEvent(QMouseEvent* event)
-{
+	//viewMouseMoveEvent(event);
 	int x = AL::sigmap.raster(event->x(), *raster);
 	emit timeChanged(x);
+	pos[3] = x;
 	int i;
 	switch (button)
 	{
@@ -107,7 +102,44 @@ void SigScale::viewMouseMoveEvent(QMouseEvent* event)
 	Pos p(x, true);
 	song->setPos(i, p);
 	redraw();
+}/*}}}*/
+
+void SigScale::viewMouseMoveEvent(QMouseEvent* event)
+{
+	int x = AL::sigmap.raster(event->x(), *raster);/*{{{*/
+	emit timeChanged(x);
+	pos[3] = x;
+	int i;
+	switch (button)
+	{
+		case Qt::LeftButton:
+			i = 0;
+			pos[0] = x;
+			break;
+		case Qt::MidButton:
+			i = 1;
+			pos[1] = x;
+			break;
+		case Qt::RightButton:
+			i = 2;
+			pos[2] = x;
+			break;
+		default:
+			pos[3] = x;
+			redraw();
+			return;
+	}
+	Pos p(x, true);
+	song->setPos(i, p);
+	redraw();/*}}}*/
 }
+
+void SigScale::viewMouseReleaseEvent(QMouseEvent*)/*{{{*/
+{
+	button = Qt::NoButton;
+	m_startCursorMove = false;
+	m_movingCursor = false;
+}/*}}}*/
 
 //---------------------------------------------------------
 //   leaveEvent
@@ -153,17 +185,20 @@ void SigScale::pdraw(QPainter& p, const QRect& r)
 	//---------------------------------------------------
 
 	//Christopher here is your color
-	p.setPen(QColor(156,75,219));
-
+	QList<QColor> colors;
+	colors << QColor(0, 186, 255) << QColor(139, 225, 69) << QColor(139, 225, 69) << QColor(156,75,219);
 	if (pos[3] != MAXINT)
 	{
+		p.setPen(colors.at(3));
 		int xp = mapx(pos[3]);
 		if (xp >= x && xp < x + w)
-			p.drawLine(xp, 0, xp, height());
+		{
+			p.drawLine(xp, 0, xp, height()-10);
+			QPixmap* pm = markIcon[3];
+			p.drawPixmap(xp - pm->width() / 2, 1, *pm);
+		}
 	}
 
-	QList<QColor> colors;
-	colors << QColor(0, 186, 255) << QColor(139, 225, 69) << QColor(139, 225, 69);
 	//colors << QColor(139, 225, 69) << QColor(139, 225, 69) << QColor(0, 186, 255);
 	for (int i = 0; i < 3; ++i)
 	{

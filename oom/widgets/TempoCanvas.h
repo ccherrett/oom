@@ -32,7 +32,7 @@ class TempoCanvas : public View
         DRAG_DELETE, DRAG_COPY_START, DRAG_COPY,
         DRAG_RESIZE, DRAG_LASSO_START, DRAG_LASSO
     };
-    unsigned pos[3];
+    unsigned pos[4];
     QPoint start;
     QPoint lastPos;
     Tool tool;

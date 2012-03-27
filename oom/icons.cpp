@@ -43,43 +43,11 @@
 #include "xpm/view_marker.xpm"
 #include "xpm/view_mixer.xpm"
 #include "xpm/view_transport_window.xpm"
-/*
-#include "xpm/pointer.xpm"
-#include "xpm/pencil.xpm"
-#include "xpm/delete.xpm"
-#include "xpm/play.xpm"
-*/
-/*
-#include "xpm/record1.xpm"
-#include "xpm/record.xpm"
-#include "xpm/record_on.xpm"
-#include "xpm/record_off.xpm"
-#include "xpm/stop.xpm"
-#include "xpm/start.xpm"
-#include "xpm/fforward.xpm"
-#include "xpm/frewind.xpm"
-#include "xpm/punchin.xpm"
-#include "xpm/punchout.xpm"
-#include "xpm/punchin1.xpm"
-#include "xpm/punchout1.xpm"
-#include "xpm/loop1.xpm"
-#include "xpm/loop.xpm"
-#include "xpm/dot.xpm"
-#include "xpm/doth.xpm"
-#include "xpm/dot1.xpm"
-*/
 #include "xpm/note.xpm"
 #include "xpm/note1.xpm"
 #include "xpm/stick.xpm"
 #include "xpm/wave.xpm"
 #include "xpm/synth.xpm"
-#include "xpm/cmark.xpm"
-#include "xpm/lmark.xpm"
-#include "xpm/rmark.xpm"
-//#include "xpm/cut.xpm"
-//#include "xpm/steprec.xpm"
-//#include "xpm/glue.xpm"
-//#include "xpm/draw.xpm"
 #include "xpm/quant.xpm"
 #include "xpm/fileprint.xpm"
 #include "xpm/filesave.xpm"
@@ -95,16 +63,6 @@
 #include "xpm/home.xpm"
 #include "xpm/back.xpm"
 #include "xpm/forward.xpm"
-
-// #include "xpm/mute.xpm"
-//#include "xpm/solobutton_on.xpm"
-//#include "xpm/solobutton_off.xpm"
-//#include "xpm/solobutton_on_blksq.xpm"
-//#include "xpm/solobutton_off_blksq.xpm"
-//#include "xpm/mutebutton_on.xpm"
-//#include "xpm/mutebutton_off.xpm"
-//#include "xpm/rec_echo_on.xpm"
-//#include "xpm/rec_echo_off.xpm"
 
 #include "xpm/up.xpm"
 #include "xpm/down.xpm"
@@ -123,8 +81,6 @@
 #include "xpm/flagS.xpm"
 #include "xpm/lock.xpm"
 #include "xpm/toc.xpm"
-// #include "xpm/piano.xpm" // not used -Orcan
-// #include "xpm/pianoS.xpm"
 #include "xpm/exitS.xpm"
 
 #include "xpm/undo.xpm"
@@ -134,36 +90,22 @@
 #include "xpm/editcutS.xpm"
 #include "xpm/editcopyS.xpm"
 #include "xpm/editpasteS.xpm"
-//#include "xpm/editmute.xpm"
 #include "xpm/editmuteS.xpm"
 #include "xpm/editpastecloneS.xpm"
 #include "xpm/editpaste2trackS.xpm"
 #include "xpm/editpasteclone2trackS.xpm"
 
-/* Not used - Orcan
-#include "xpm/editcut.xpm"
-#include "xpm/editcopy.xpm"
-#include "xpm/editpaste.xpm"
-#include "xpm/editpasteclone.xpm"
-#include "xpm/editpaste2track.xpm"
-#include "xpm/editpasteclone2track.xpm"
-*/
-//#include "xpm/speaker.xpm"
 #include "xpm/buttondown.xpm"
 #include "xpm/configure.xpm"
-//#include "xpm/panic.xpm"
 
 
 // next two lines will vanish soon
 #include "xpm/solobutton.xpm"
 #include "xpm/newmutebutton.xpm"
-//#include "xpm/exit.xpm"
-//#include "xpm/exit1.xpm"
 
 #include "xpm/redled.xpm"
 #include "xpm/darkredled.xpm"
 #include "xpm/greendot.xpm"
-//#include "xpm/darkgreendot.xpm"
 #include "xpm/bluedot.xpm"
 #include "xpm/graydot.xpm"
 #include "xpm/off.xpm"
@@ -174,7 +116,6 @@
 #include "xpm/localoffS.xpm"
 #include "xpm/miditransformS.xpm"
 #include "xpm/midi_plugS.xpm"
-//#include "xpm/miditransposeS.xpm"
 #include "xpm/mixerS.xpm"
 #include "xpm/mustangS.xpm"
 #include "xpm/resetS.xpm"
@@ -183,7 +124,6 @@
 #include "xpm/listS.xpm"
 #include "xpm/inputpluginS.xpm"
 #include "xpm/cliplistS.xpm"
-//#include "xpm/mixeraudioS.xpm"
 #include "xpm/initS.xpm"
 
 #include "xpm/addtrack_addmiditrack.xpm"
@@ -209,16 +149,10 @@
 #include "xpm/select.xpm"
 #include "xpm/select_all.xpm"
 #include "xpm/select_all_parts_on_track.xpm"
-//#include "xpm/select_deselect_all.xpm"
 #include "xpm/select_inside_loop.xpm"
-//#include "xpm/select_invert_selection.xpm"
 #include "xpm/select_outside_loop.xpm"
 
-//#include "xpm/mono.xpm"
-//#include "xpm/stereo.xpm"
 #include "xpm/oom_icon.xpm"
-//#include "xpm/about_oom.xpm"
-//#include "xpm/oom_leftside_logo.xpm"
 
 #include "xpm/global.xpm"
 #include "xpm/project.xpm"
@@ -310,7 +244,7 @@ QPixmap* noteIcon;
 QPixmap* stickIcon;
 QPixmap* waveIcon;
 QPixmap* synthIcon;
-QPixmap* markIcon[3];
+QPixmap* markIcon[4];
 QPixmap* cutIcon;
 QPixmap* steprecIcon;
 QPixmap* glueIcon;
@@ -917,11 +851,10 @@ void initIcons()
       markIcon[0]  = new MPIXMAP(":/images/icons/cmark.png", NULL);
       markIcon[1]  = new MPIXMAP(":/images/icons/lmark.png", NULL);
       markIcon[2]  = new MPIXMAP(":/images/icons/rmark.png", NULL);
+      markIcon[3]  = new MPIXMAP(":/images/icons/emark.png", NULL);
       cutIcon      = new MPIXMAP(":/images/icons/split.png", NULL);
-      //steprecIcon  = new MPIXMAP(steprec_xpm, NULL);
       steprecIcon  = new MPIXMAP(":/images/icons/step_by_step.png", NULL);
       glueIcon     = new MPIXMAP(":/images/icons/join_tracks.png", NULL);
-      //drawIcon     = new MPIXMAP(draw_xpm, NULL);
       drawIcon     = new MPIXMAP(":/images/icons/line-tool.png", NULL);
       quantIcon    = new MPIXMAP(quant_xpm, NULL);
       saveIcon     = new MPIXMAP(filesave_xpm, NULL);
@@ -997,15 +930,6 @@ void initIcons()
       editpaste2TrackIconSet = new MICON(editpaste2trackS_xpm, NULL);
       editpasteCloneIconSet  = new MICON(editpastecloneS_xpm, NULL);
       editpasteClone2TrackIconSet = new MICON(editpasteclone2trackS_xpm, NULL); // ..
-      /* Not used - Orcan
-      pianoIcon                 = new MICON(piano_xpm, NULL);
-      editcutIcon               = new MICON(editcut_xpm, "edit-cut");
-      editcopyIcon              = new MICON(editcopy_xpm, "edit-copy");
-      editpasteIcon             = new MICON(editpaste_xpm, "edit-paste");
-      editpasteCloneIcon        = new MICON(editpasteclone_xpm, NULL);
-      editpaste2TrackIcon       = new MICON(editpaste2track_xpm, NULL);
-      editpasteClone2TrackIcon  = new MICON(editpasteclone2track_xpm, NULL);
-      */
       exitIcon             = new MPIXMAP(":/images/icons/mixer-exit.png", NULL);//"application-exit");
       exit1Icon            = new MPIXMAP(":/images/icons/mixer-exit_on.png", NULL);//"application-exit");
 
@@ -1063,17 +987,7 @@ void initIcons()
       midiInIconSet3->addPixmap(*midiInIconOn, QIcon::Normal, QIcon::On);
       midiInIconSet3->addPixmap(*midiInIconOff, QIcon::Normal, QIcon::Off);
       midiInIconSet3->addPixmap(*midiInIconOver, QIcon::Active);
-     /* 
-	  muteIconOn = new MPIXMAP(":/images/icons/mixer-mute_on.png", NULL);
-      muteIconOff= new MPIXMAP(":/images/icons/mixer-mute.png", NULL);
-      muteIconOver= new MPIXMAP(":/images/icons/mixer-mute_over.png", NULL);
-	  */
 	  muteIconSet4         = new QIcon();
-      /*
-	  muteIconSet4->addPixmap(*muteIconOn, QIcon::Normal, QIcon::On);
-      muteIconSet4->addPixmap(*muteIconOff, QIcon::Normal, QIcon::Off);
-      muteIconSet4->addPixmap(*muteIconOver, QIcon::Active);
-      */
 	  transport_recordIconOn = new MPIXMAP(":/images/icons/transport-record_new_on.png", NULL);
       transport_recordIconOff = new MPIXMAP(":/images/icons/transport-record_new_off.png", NULL);
       transport_recordIconOver = new MPIXMAP(":/images/icons/transport-record_new_over.png", NULL);
@@ -1557,7 +1471,6 @@ void initIcons()
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);
       greendotIcon         = new MPIXMAP(greendot_xpm, NULL);
-      //darkgreendotIcon     = new MPIXMAP(darkgreendot_xpm, NULL);
       bluedotIcon          = new MPIXMAP(bluedot_xpm, NULL);
       graydotIcon          = new MPIXMAP(graydot_xpm, NULL);
       offIcon              = new MPIXMAP(off_xpm, NULL);

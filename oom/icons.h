@@ -39,7 +39,7 @@ extern QPixmap* note1Icon;
 extern QPixmap* stickIcon;
 extern QPixmap* waveIcon;
 extern QPixmap* synthIcon;
-extern QPixmap* markIcon[3];
+extern QPixmap* markIcon[4];
 
 extern QPixmap* multiDisplay;
 extern QPixmap* previousPartIcon;
