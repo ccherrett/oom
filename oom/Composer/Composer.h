@@ -131,7 +131,6 @@ private slots:
 	void resourceDockAreaChanged(Qt::DockWidgetArea);
 	void currentTabChanged(int);
 	void composerViewChanged();
-	void updateAll();
 	void updateScroll(int, int);
 	void headerTabChanged(int);
 	void setStartTempo(double);
@@ -168,6 +167,7 @@ public slots:
     void verticalScrollSetYpos(unsigned);
 	void preloadControllers();
 	void heartBeat();
+	void updateAll();
 
 public:
 

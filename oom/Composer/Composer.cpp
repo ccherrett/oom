@@ -335,7 +335,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	m_headerTabs->addTab(&virtualScroll, QString(tr("Navigator")));
 	m_headerTabs->addTab(m_tempoHeader, QString(tr("Tempo")));
-	m_headerTabs->setCornerWidget(headerCornerWidget(0));
+	m_headerTabs->setCornerWidget(headerCornerWidget(1));
 	connect(m_headerTabs, SIGNAL(currentChanged(int)), this, SLOT(headerTabChanged(int)));
 
 	m_tempoHeader->setStartTempo(m_tempoStart);
@@ -483,6 +483,7 @@ QWidget* Composer::headerCornerWidget(int tab)
 	connect(m_tempoRange, SIGNAL(maxChanged(double)), this, SLOT(setEndTempo(double)));
 	
 	m_headerToolBox->setCurrentIndex(tab);
+	m_headerTabs->setCurrentIndex(tab);
 	return m_headerToolBox;
 }
 
