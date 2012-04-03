@@ -1119,7 +1119,8 @@ void VstPlugin::writeConfiguration(int level, Xml& xml)
         if (data && data_size >= 4)
         {
             QByteArray qchunk((const char*)data, data_size);
-            const char* chunk = strdup(qchunk.toBase64().data());
+			QByteArray coded = qchunk.toBase64();
+            const char* chunk = strdup(coded.data());
             xml.strTag(level, "chunkFull", chunk);
             free((void*)chunk);
         }
